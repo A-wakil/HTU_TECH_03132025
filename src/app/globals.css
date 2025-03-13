@@ -156,38 +156,34 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Fix dropdown and tooltip backgrounds */
-[role="listbox"],
-[role="tooltip"] {
+/* Fix dropdown styling */
+[role="listbox"] {
   background-color: hsl(var(--background));
   border: 1px solid hsl(var(--border));
-}
-
-.select-content,
-.recharts-tooltip-wrapper {
-  background-color: hsl(var(--background)) !important;
-}
-
-[data-radix-popper-content-wrapper],
-.recharts-default-tooltip {
-  background-color: hsl(var(--background)) !important;
-  border: 1px solid hsl(var(--border)) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Custom tooltip styles */
-.recharts-tooltip-wrapper {
-  border-radius: 6px;
+  border-radius: var(--radius);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
 }
 
-.recharts-tooltip-item {
-  color: hsl(var(--foreground)) !important;
+/* Remove duplicate backgrounds */
+.select-content {
+  background: none !important;
+  border: none !important;
 }
 
-.recharts-tooltip-label {
-  color: hsl(var(--muted-foreground)) !important;
+[data-radix-popper-content-wrapper] {
+  background: none !important;
+  border: none !important;
+}
+
+/* Ensure proper z-index */
+.select-content {
+  z-index: 50;
+}
+
+/* Clean up any duplicate borders */
+.select-content > * {
+  border: none !important;
 }
 
 /* Sidebar styles */

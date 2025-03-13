@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import styles from "./page.module.css";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, MapPin } from "lucide-react";
 import { CartesianGrid, Dot, Line, LineChart, XAxis } from "recharts";
 import {
   Card,
@@ -58,6 +58,8 @@ export default function Home() {
 
   const [activeMonth, setActiveMonth] = React.useState("Jun");
 
+  const [activeCTRMonth, setActiveCTRMonth] = React.useState("Jun");
+
   const revenueChartConfig = {
     value: {
       label: "Revenue",
@@ -93,6 +95,30 @@ export default function Home() {
     value: {
       label: "ROI",
       color: "hsl(var(--chart-2))",
+    },
+    Jan: {
+      label: "January",
+      color: "hsl(var(--chart-1))",
+    },
+    Feb: {
+      label: "February",
+      color: "hsl(var(--chart-2))",
+    },
+    Mar: {
+      label: "March",
+      color: "hsl(var(--chart-3))",
+    },
+    Apr: {
+      label: "April",
+      color: "hsl(var(--chart-4))",
+    },
+    May: {
+      label: "May",
+      color: "hsl(var(--chart-5))",
+    },
+    Jun: {
+      label: "June",
+      color: "hsl(var(--chart-6))",
     },
   };
 
@@ -142,6 +168,32 @@ export default function Home() {
     },
   };
 
+  const ctrData = [
+    { month: "Jan", value: 2.4 },
+    { month: "Feb", value: 2.8 },
+    { month: "Mar", value: 3.2 },
+    { month: "Apr", value: 2.9 },
+    { month: "May", value: 3.5 },
+    { month: "Jun", value: 3.8 },
+  ];
+
+  const geoData = [
+    { region: "North America", value: 35, color: "hsl(var(--chart-1))" },
+    { region: "Europe", value: 25, color: "hsl(var(--chart-2))" },
+    { region: "Asia", value: 20, color: "hsl(var(--chart-3))" },
+    { region: "Africa", value: 15, color: "hsl(var(--chart-4))" },
+    { region: "Others", value: 5, color: "hsl(var(--chart-5))" },
+  ];
+
+  const ctrChartConfig = {
+    Jan: { label: "January", color: "hsl(var(--chart-1))" },
+    Feb: { label: "February", color: "hsl(var(--chart-2))" },
+    Mar: { label: "March", color: "hsl(var(--chart-3))" },
+    Apr: { label: "April", color: "hsl(var(--chart-4))" },
+    May: { label: "May", color: "hsl(var(--chart-5))" },
+    Jun: { label: "June", color: "hsl(var(--chart-6))" },
+  };
+
   const renderRevenueChart = () => {
     const activeIndex = revenueData.findIndex(
       (item) => item.month === activeRevenueMonth
@@ -188,43 +240,54 @@ export default function Home() {
           </p>
           <ChartContainer config={revenueChartConfig}>
             <LineChart
-              width={300}
-              height={100}
               data={revenueData}
-              margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              margin={{
+                top: 5,
+                right: 20,
+                left: 20,
+                bottom: 25
+              }}
+              width={500}
+              height={300}
             >
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                interval={0}
+              />
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent indicator="line" nameKey="value" />}
+                content={<ChartTooltipContent hideLabel />}
               />
               <Line
-                type="monotone"
+                type="linear"
                 dataKey="value"
-                stroke="hsl(var(--primary))"
+                stroke="hsl(var(--chart-2))"
                 strokeWidth={2}
                 dot={(props) => {
                   const { cx, cy, index } = props;
                   return (
-                    <Dot
-                      key={`dot-${index}`}
+                    <circle
                       cx={cx}
                       cy={cy}
                       r={4}
-                      fill="hsl(var(--primary))"
-                      stroke="hsl(var(--primary))"
+                      fill={`hsl(var(--chart-${index + 1}))`}
+                      stroke="hsl(var(--background))"
+                      strokeWidth={2}
                     />
                   );
                 }}
                 activeDot={(props) => {
                   const { cx, cy, index } = props;
                   return (
-                    <Dot
-                      key={`active-dot-${index}`}
+                    <circle
                       cx={cx}
                       cy={cy}
                       r={6}
-                      fill="hsl(var(--primary))"
+                      fill={`hsl(var(--chart-${index + 1}))`}
                       stroke="hsl(var(--background))"
                       strokeWidth={2}
                     />
@@ -247,89 +310,117 @@ export default function Home() {
     );
   };
 
-  const renderROIChart = () => (
-    <Card className={styles.metricCard}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div>
-          <CardTitle>Return on Investment</CardTitle>
-          <CardDescription>January - June 2024</CardDescription>
-        </div>
-        <Select value={activeMonth} onValueChange={setActiveMonth}>
-          <SelectTrigger
-            className="h-8 w-[130px] rounded-lg"
-            aria-label="Select month"
-          >
-            <SelectValue placeholder="Select month" />
-          </SelectTrigger>
-          <SelectContent align="end" className="rounded-xl">
-            {roiData.map(({ month }) => (
-              <SelectItem
-                key={month}
-                value={month}
-                className="rounded-lg [&_span]:flex"
-              >
-                {month}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </CardHeader>
-      <CardContent>
-        <p className={styles.metricValue}>
-          {roiData.find(item => item.month === activeMonth)?.value}%
-        </p>
-        <ChartContainer config={roiChartConfig}>
-          <LineChart
-            data={roiData}
-            margin={{
-              top: 5,
-              right: 10,
-              left: 10,
-              bottom: 20,
-            }}
-          >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Line
-              type="linear"
-              dataKey="value"
-              stroke="hsl(var(--chart-2))"
-              strokeWidth={2}
-              dot={{
-                fill: "hsl(var(--chart-2))",
-                strokeWidth: 2,
-                r: 4,
-                stroke: "hsl(var(--background))"
+  const renderROIChart = () => {
+    return (
+      <Card className={styles.metricCard}>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div>
+            <CardTitle>Return on Investment</CardTitle>
+            <CardDescription>January - June 2024</CardDescription>
+          </div>
+          <Select value={activeMonth} onValueChange={setActiveMonth}>
+            <SelectTrigger
+              className="h-8 w-[130px] rounded-lg"
+              aria-label="Select month"
+            >
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent align="end" className="rounded-xl">
+              {roiData.map(({ month }) => (
+                <SelectItem
+                  key={month}
+                  value={month}
+                  className="rounded-lg [&_span]:flex"
+                >
+                  <div className="flex items-center gap-2 text-xs">
+                    <span
+                      className="flex h-3 w-3 shrink-0 rounded-sm"
+                      style={{
+                        backgroundColor: roiChartConfig[month].color,
+                      }}
+                    />
+                    {roiChartConfig[month].label}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardHeader>
+        <CardContent>
+          <p className={styles.metricValue}>
+            {roiData.find(item => item.month === activeMonth)?.value}%
+          </p>
+          <ChartContainer config={roiChartConfig}>
+            <LineChart
+              data={roiData}
+              margin={{
+                top: 5,
+                right: 20,
+                left: 20,
+                bottom: 25
               }}
-              activeDot={{
-                r: 6,
-                stroke: "hsl(var(--background))",
-                strokeWidth: 2,
-              }}
-            />
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          <TrendingUp className="h-4 w-4" />
-          <span>8% from last month</span>
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing ROI trends over time
-        </div>
-      </CardFooter>
-    </Card>
-  );
+              width={500}
+              height={300}
+            >
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                interval={0}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Line
+                type="linear"
+                dataKey="value"
+                stroke="hsl(var(--chart-2))"
+                strokeWidth={2}
+                dot={(props) => {
+                  const { cx, cy, index } = props;
+                  return (
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={4}
+                      fill={`hsl(var(--chart-${index + 1}))`}
+                      stroke="hsl(var(--background))"
+                      strokeWidth={2}
+                    />
+                  );
+                }}
+                activeDot={(props) => {
+                  const { cx, cy, index } = props;
+                  return (
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={6}
+                      fill={`hsl(var(--chart-${index + 1}))`}
+                      stroke="hsl(var(--background))"
+                      strokeWidth={2}
+                    />
+                  );
+                }}
+              />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 font-medium leading-none">
+            <TrendingUp className="h-4 w-4" />
+            <span>8% from last month</span>
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Showing ROI trends over time
+          </div>
+        </CardFooter>
+      </Card>
+    );
+  };
 
   const renderConversionChart = () => {
     const activeIndex = conversionData.findIndex(
@@ -445,6 +536,161 @@ export default function Home() {
     );
   };
 
+  const renderCTRChart = () => {
+    return (
+      <Card className={styles.metricCard}>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div>
+            <CardTitle>Click-Through Rate</CardTitle>
+            <CardDescription>January - June 2024</CardDescription>
+          </div>
+          <Select value={activeCTRMonth} onValueChange={setActiveCTRMonth}>
+            <SelectTrigger
+              className="h-8 w-[130px] rounded-lg"
+              aria-label="Select month"
+            >
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent align="end" className="rounded-xl">
+              {ctrData.map(({ month }) => (
+                <SelectItem
+                  key={month}
+                  value={month}
+                  className="rounded-lg [&_span]:flex"
+                >
+                  <div className="flex items-center gap-2 text-xs">
+                    <span
+                      className="flex h-3 w-3 shrink-0 rounded-sm"
+                      style={{
+                        backgroundColor: ctrChartConfig[month].color,
+                      }}
+                    />
+                    {ctrChartConfig[month].label}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardHeader>
+        <CardContent>
+          <p className={styles.metricValue}>
+            {ctrData.find(item => item.month === activeCTRMonth)?.value}%
+          </p>
+          <ChartContainer config={ctrChartConfig}>
+            <LineChart
+              data={ctrData}
+              margin={{
+                top: 5,
+                right: 20,
+                left: 20,
+                bottom: 25
+              }}
+              width={500}
+              height={300}
+            >
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                interval={0}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Line
+                type="linear"
+                dataKey="value"
+                stroke="hsl(var(--chart-2))"
+                strokeWidth={2}
+                dot={(props) => {
+                  const { cx, cy, index } = props;
+                  return (
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={4}
+                      fill={`hsl(var(--chart-${index + 1}))`}
+                      stroke="hsl(var(--background))"
+                      strokeWidth={2}
+                    />
+                  );
+                }}
+                activeDot={(props) => {
+                  const { cx, cy, index } = props;
+                  return (
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={6}
+                      fill={`hsl(var(--chart-${index + 1}))`}
+                      stroke="hsl(var(--background))"
+                      strokeWidth={2}
+                    />
+                  );
+                }}
+              />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 font-medium leading-none">
+            <TrendingUp className="h-4 w-4" />
+            <span>0.3% from last month</span>
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Average CTR across all campaigns
+          </div>
+        </CardFooter>
+      </Card>
+    );
+  };
+
+  const renderGeoDistribution = () => {
+    return (
+      <Card className={styles.metricCard}>
+        <CardHeader>
+          <CardTitle>Geographic Distribution</CardTitle>
+          <CardDescription>Active regions by traffic</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {geoData.map((item) => (
+              <div key={item.region} className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <MapPin
+                    size={20}
+                    style={{ color: item.color }}
+                  />
+                  <span className="text-sm font-medium">{item.region}</span>
+                </div>
+                <div className="flex-1">
+                  <div className="h-2 rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${item.value}%`,
+                        backgroundColor: item.color,
+                      }}
+                    />
+                  </div>
+                </div>
+                <span className="text-sm font-medium">{item.value}%</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="leading-none text-muted-foreground">
+            Based on user traffic data
+          </div>
+        </CardFooter>
+      </Card>
+    );
+  };
+
   const renderCO2Chart = () => (
     <Card className={styles.metricCard}>
       <CardHeader>
@@ -513,8 +759,10 @@ export default function Home() {
 
       <section className={styles.metricsGrid}>
         {renderRevenueChart()}
-        {renderROIChart()}
         {renderConversionChart()}
+        {renderROIChart()}
+        {renderCTRChart()}
+        {renderGeoDistribution()}
         {renderCO2Chart()}
       </section>
 

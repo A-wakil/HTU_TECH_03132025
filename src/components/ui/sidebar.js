@@ -4,15 +4,13 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
-  BarChart3, 
-  Settings, 
-  Users, 
-  MessageSquare,
+  LayoutDashboard,
+  Leaf,
+  Star,
   ChevronLeft,
-  ChevronRight,
-  LayoutDashboard
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 const sidebarItems = [
   {
@@ -22,23 +20,13 @@ const sidebarItems = [
   },
   {
     title: "GreenAds",
-    icon: BarChart3,
+    icon: Leaf,
     href: "/greenads",
   },
   {
     title: "Reviews",
-    icon: Users,
+    icon: Star,
     href: "/reviews",
-  },
-  {
-    title: "Messages",
-    icon: MessageSquare,
-    href: "/messages",
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    href: "/settings",
   },
 ]
 
@@ -50,39 +38,87 @@ export function Sidebar() {
     <aside className="sticky top-0 h-screen">
       <div
         className={cn(
-          "relative h-full border-r border-border bg-background px-4 pb-10 pt-16 transition-all duration-300 ease-in-out",
+          "relative h-full border-r border-border bg-card px-4 pb-10 transition-all duration-300 ease-in-out",
           isCollapsed ? "w-20" : "w-72"
         )}
       >
+        {/* Logo Section */}
+        <div className="flex h-16 items-center justify-center border-b border-border">
+          <Image
+            src="/avata_logo.webp"
+            alt="Avata Logo"
+            width={isCollapsed ? 30 : 40}
+            height={isCollapsed ? 30 : 40}
+            className="rounded-full transition-all duration-300"
+          />
+        </div>
+
+        {/* Enhanced Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            "absolute -right-3 top-16 flex h-6 w-6 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent",
+            "absolute -right-3 top-20 flex h-7 w-7 items-center justify-center rounded-full border bg-primary text-primary-foreground shadow-md",
+            "hover:bg-primary/90 hover:shadow-lg",
+            "transition-all duration-200 ease-in-out",
+            "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
             isCollapsed && "rotate-180"
           )}
+          style={{
+            backgroundColor: "hsl(var(--primary))",
+            color: "hsl(var(--primary-foreground))",
+            zIndex: 50,
+          }}
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft 
+            size={18} 
+            className="transition-transform duration-200"
+          />
         </button>
         
-        <nav className="space-y-2">
+        {/* Navigation */}
+        <nav className="mt-8 space-y-2">
           {sidebarItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex h-10 items-center gap-x-3 rounded-lg px-3 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                pathname === item.href && "bg-accent text-accent-foreground"
+                "flex h-11 items-center gap-x-4 rounded-lg px-4 text-muted-foreground transition-all hover:bg-accent hover:text-accent-foreground",
+                pathname === item.href && 
+                "bg-accent/50 text-foreground font-medium hover:bg-accent/60",
+                isCollapsed && "px-3"
               )}
             >
-              <item.icon size={20} />
+              <item.icon 
+                size={22} 
+                className={cn(
+                  "shrink-0",
+                  pathname === item.href && "text-primary"
+                )}
+              />
               {!isCollapsed && (
-                <span className="text-sm font-medium transition-opacity duration-300">
+                <span className="text-sm">
                   {item.title}
                 </span>
               )}
             </Link>
           ))}
         </nav>
+
+        {/* User Section */}
+        <div className={cn(
+          "absolute bottom-8 left-4 right-4 rounded-lg border bg-card p-4",
+          isCollapsed && "p-2"
+        )}>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-muted" />
+            {!isCollapsed && (
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">John Doe</span>
+                <span className="text-xs text-muted-foreground">Admin</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </aside>
   )

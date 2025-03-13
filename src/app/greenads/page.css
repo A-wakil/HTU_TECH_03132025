@@ -1,0 +1,51 @@
+.ad-tab {
+    text-align: center;
+    padding: 20px;
+}
+  
+ 
+.ad-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Ensures equal width */
+    gap: 15px;
+    padding: 20px;
+}
+
+.ad-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    width: 100%; 
+    height: 220px;
+}
+  
+
+@media (min-width: 1200px) {
+    .ad-grid {
+      grid-template-columns: repeat(4, 1fr); 
+    }
+}
+  
+@media (max-width: 1199px) {
+    .ad-grid {
+      grid-template-columns: repeat(3, 1fr); 
+    }
+}
+  
+@media (max-width: 768px) {
+    .ad-grid {
+      grid-template-columns: repeat(2, 1fr); 
+    }
+}
+  
+@media (max-width: 480px) {
+    .ad-grid {
+      grid-template-columns: repeat(1, 1fr); 
+    }
+}
+  

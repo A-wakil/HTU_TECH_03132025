@@ -1,55 +1,106 @@
 .ad-view {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
   
- 
 .ad-view-head {
     display: flex;
     align-items: center;
     width: 100%;
-    justify-content: space-between; 
-    padding: 10px 20px;
+    margin-bottom: 2rem;
     position: relative;
 }
-  
 
-.ad-view-head button {
-    background-color: #000000;
-    color: white;
+.back-button {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
     border: none;
     padding: 10px 15px;
     border-radius: 100%;
     cursor: pointer;
+    transition: opacity 0.2s;
 }
 
-.ad-view-head button:hover {
-    background-color: #393838;
+.back-button:hover {
+    opacity: 0.9;
+}
+
+.reiterate-button {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.reiterate-button:hover {
+    background-color: hsl(var(--primary)/0.9);
 }
 
 .ad-view-head h1 {
     flex-grow: 1;
     text-align: center;
     margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
 }
-  
+
+.ad-view-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
 .ad-view-image {
-    margin-top: 20px;
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-  
-.ad-icon-large {
-    width: 300px;
-    height: auto;
-    margin: 20px 0;
+
+.image-container {
+    width: 400px;
+    height: 300px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-  
-.ad-view-content {
-    text-align: center;
-    font-size: 18px;
-    color: #333;
-    margin-top: 15px;
+
+.ad-image {
+    max-width: 100%;
+    height: 300px;
+    border-radius: 0.25rem;
 }
-  
-  
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .ad-view {
+        padding: 1rem;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .image-container {
+        width: 100%;
+        height: auto;
+    }
+}

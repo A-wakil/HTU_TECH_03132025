@@ -1,14 +1,12 @@
 "use client"
 
 import { useRouter } from "next/navigation";
+import Image from 'next/image';
 import "./AdCard.css"
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart"
 
 const chartConfig = {
@@ -22,20 +20,54 @@ const chartConfig = {
   },
 }
 
-function AdCard({ name, chartData }) {
+function AdCard({ id, name, chartData, imageIndex }) {
     const router = useRouter();
 
     const handleClick = () => {
-        router.push(`/ad-view/${name}`);
+        router.push(`/greenads/add-view/${id}`);
     };
 
+   
+    const getImagePath = () => {
+        switch(imageIndex) {
+            case 1:
+                return "/Burger.PNG";
+            case 2:
+                return "/icecream.png";
+            case 3:
+                return "/cake.png";
+            case 4:
+                return "/pizza.jpeg";
+            case 5:
+                return "/Burger2.PNG";
+            case 6:
+                return "/Burger3.PNG";
+            case 7:
+                return "/Burger3.PNG";
+            case 8:
+                return "/Burger3.PNG";
+            default:
+                return "/Burger.PNG";
+        }
+    };
     return(
         <div className="ad-card" onClick={handleClick}>
             <div className="chart-container">
-                <ChartContainer config={chartConfig}>
+                <Image 
+                    src={getImagePath()}
+                    alt={name}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    priority={true}
+                />
+                <div className="name-overlay">
+                    <h3>{name}</h3>
+                </div>
+            
+                {/* <ChartContainer config={chartConfig}>
                     <BarChart 
-                        width={150}
-                        height={100}
+                        width={200}  // Increased width
+                        height={120}  // Increased height
                         data={chartData}
                         margin={{
                             top: 5,
@@ -44,35 +76,28 @@ function AdCard({ name, chartData }) {
                             bottom: 5,
                         }}
                     >
-                        <CartesianGrid vertical={false} />
+                        <CartesianGrid vertical={false} strokeWidth={0.5} />
                         <XAxis
                             dataKey="month"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={5}
-                            tick={{ fontSize: 10 }}
-                        />
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent indicator="dashed" />}
+                            tick={{ fontSize: 10, fontWeight: 600 }}
                         />
                         <Bar 
                             dataKey="desktop" 
                             fill="hsl(var(--chart-1))" 
-                            radius={[2, 2, 0, 0]} 
+                            radius={[2, 2, 0, 0]}
+                            strokeWidth={2}
                         />
                         <Bar 
                             dataKey="mobile" 
                             fill="hsl(var(--chart-2))" 
-                            radius={[2, 2, 0, 0]} 
+                            radius={[2, 2, 0, 0]}
+                            strokeWidth={2}
                         />
                     </BarChart>
-                </ChartContainer>
-            </div>
-            <div className="ad-divider"></div>
-
-            <div>
-                <h3>{name}</h3>
+                </ChartContainer> */}
             </div>
         </div>
     )

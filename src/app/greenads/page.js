@@ -5,7 +5,6 @@ import AdCard from "../../components/ui/j_comp/AdCard.js";
 import "./page.css"; 
 
 function AdTab() {
-    // Generate unique data for each ad
     const generateAdData = (index) => {
         return [
             { month: "Jan", desktop: Math.floor(Math.random() * 300) + 50, mobile: Math.floor(Math.random() * 200) + 50 },
@@ -17,8 +16,7 @@ function AdTab() {
         ];
     };
 
-    // Create ads with unique data
-    const ads = Array.from({ length: 10 }, (_, i) => ({
+    const ads = Array.from({ length: 8 }, (_, i) => ({
         name: `Ad ${i + 1}`,
         chartData: generateAdData(i)
     }));
@@ -34,6 +32,7 @@ function AdTab() {
                         key={index} 
                         name={ad.name} 
                         chartData={ad.chartData}
+                        imageIndex={index}
                     />
                 ))}
             </div>

@@ -26,7 +26,7 @@ const sidebarItems = [
   {
     title: "Reviews",
     icon: Star,
-    href: "/reviews",
+    href: "/review",
   },
 ]
 

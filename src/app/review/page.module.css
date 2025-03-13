@@ -1,0 +1,453 @@
+.body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f7f9fc;
+  }
+  
+  .app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .app-header {
+    padding: 20px 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 30px;
+  }
+  
+  .app-header h1 {
+    color: #1a2b49;
+    font-size: 28px;
+  }
+  
+  .highlight {
+    color: #4a8cff;
+  }
+  
+  .main-content {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+  }
+  
+  /* Upload Interface */
+  .upload-container {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .upload-container h2 {
+    color: #1a2b49;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .upload-box {
+    border: 2px dashed #cfd7e6;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    background-color: #f5f7fa;
+    position: relative;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+  }
+  
+  .drag-active {
+    border-color: #4a8cff;
+    background-color: #e8f4fd;
+  }
+  
+  .file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .upload-content {
+    pointer-events: none;
+  }
+  
+  .upload-icon {
+    font-size: 32px;
+    color: #1a2b49;
+    background-color: #e8f4fd;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+  
+  .or-divider {
+    margin: 10px 0;
+    color: #888;
+  }
+  
+  .browse-button {
+    background-color: #4a8cff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .file-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .file-name {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .change-file-btn {
+    background-color: transparent;
+    color: #4a8cff;
+    border: 1px solid #4a8cff;
+    border-radius: 20px;
+    padding: 5px 15px;
+    cursor: pointer;
+  }
+  
+  .context-container {
+    margin-bottom: 30px;
+  }
+  
+  .context-container h3 {
+    margin-bottom: 10px;
+    color: #1a2b49;
+  }
+  
+  .context-textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #cfd7e6;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 16px;
+  }
+  
+  .error-message {
+    color: #e53e3e;
+    margin: 10px 0;
+  }
+  
+  .review-button {
+    background-color: #34d399;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    float: right;
+  }
+  
+  .review-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+  
+  /* Review Results */
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+  
+  .ad-preview, .analysis-results {
+    padding: 20px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+  }
+  
+  .ad-preview h3, .analysis-results h3 {
+    margin-bottom: 15px;
+    color: #1a2b49;
+  }
+  
+  .preview-image, .preview-video {
+    max-width: 100%;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .file-preview-box {
+    padding: 30px;
+    background-color: #e5e7eb;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  .score-card {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 15px;
+  }
+  
+  .personalization-score {
+    background-color: #f0fdf4;
+  }
+  
+  .audience-score {
+    background-color: #eff6ff;
+  }
+  
+  .performance-score {
+    background-color: #fef3c7;
+  }
+  
+  .score-card h4 {
+    margin-bottom: 5px;
+    font-size: 15px;
+  }
+  
+  .score {
+    font-weight: bold;
+    font-size: 18px;
+  }
+  
+  .metrics {
+    font-size: 14px;
+  }
+  
+  .insights-section, .recommendations-section {
+    margin-bottom: 30px;
+  }
+  
+  .insights-section h3, .recommendations-section h3 {
+    margin-bottom: 15px;
+    color: #1a2b49;
+  }
+  
+  .insights-section ul, .recommendations-section ul {
+    padding-left: 20px;
+  }
+  
+  .insights-section li, .recommendations-section li {
+    margin-bottom: 8px;
+  }
+  
+  /* Chat Interface */
+  .chat-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 20px;
+  }
+  
+  .chat-section h3 {
+    margin-bottom: 15px;
+    color: #1a2b49;
+  }
+  
+  .chat-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chat-bubble {
+    max-width: 85%;
+    padding: 15px 18px;
+    border-radius: 18px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chat-bubble p {
+    margin-bottom: 10px;
+  }
+  
+  .chat-bubble ul, .chat-bubble ol {
+    margin: 10px 0;
+    padding-left: 25px;
+  }
+  
+  .chat-bubble li {
+    margin-bottom: 6px;
+  }
+  
+  .chat-bubble h3 {
+    margin: 15px 0 10px;
+    font-size: 16px;
+    color: #1a2b49;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 3px;
+  }
+  
+  .assistant {
+    background-color: #e8f4fd;
+    color: #1a2b49;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+  }
+  
+  .user {
+    background-color: #1a2b49;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+    align-self: flex-end;
+  }
+  
+  .chat-input-form {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .chat-input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid #cfd7e6;
+    border-radius: 20px;
+    font-family: inherit;
+    font-size: 16px;
+  }
+  
+  .send-button {
+    background-color: #4a8cff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .send-button:hover {
+    background-color: #3a7de6;
+  }
+  
+  .send-button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .chat-bubble {
+      max-width: 90%;
+    }
+  }
+  
+  /* Analysis Formatting */
+  .section-title {
+    color: #1a2b49;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+  }
+  
+  .analysis-content {
+    line-height: 1.6;
+  }
+  
+  .analysis-content p {
+    margin-bottom: 15px;
+  }
+  
+  .numbered-item {
+    margin: 15px 0 10px 0;
+    font-size: 16px;
+  }
+  
+  .item-number {
+    font-weight: bold;
+    color: #4a8cff;
+    margin-right: 5px;
+  }
+  
+  .insight-list, .recommendation-list {
+    margin-bottom: 20px;
+    padding-left: 25px;
+  }
+  
+  .insight-list li, .recommendation-list li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  
+  .numbered-list-item {
+    padding-left: 5px;
+  }
+  
+  .analysis-results ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .analysis-results li {
+    margin-bottom: 10px;
+  }
+  
+  .analysis-results strong {
+    color: #1a2b49;
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  
+  .analysis-results p {
+    margin-bottom: 10px;
+  }
+  
+  .insights-section h3, .recommendations-section h3 {
+    margin-bottom: 15px;
+    color: #1a2b49;
+  }
+  
+  .insights-section ul, .recommendations-section ul {
+    padding-left: 20px;
+  }
+  
+  .insights-section li, .recommendations-section li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  
+  /* Add a special style for Visual Appeal, Target Audience, etc. */
+  .insights-section strong, .recommendations-section strong, .chat-bubble strong {
+    color: #4a8cff;
+    font-weight: 600;
+  }
+  
+  .numbered-item strong {
+    color: #4a8cff;
+    font-size: 16px;
+    margin-right: 5px;
+  }

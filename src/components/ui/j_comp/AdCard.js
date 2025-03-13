@@ -30,22 +30,22 @@ function AdCard({ id, name, chartData, imageIndex }) {
    
     const getImagePath = () => {
         switch(imageIndex) {
-            case 1:
+            case 0:
                 return "/Burger.PNG";
-            case 2:
+            case 1:
                 return "/icecream.png";
-            case 3:
+            case 2:
                 return "/cake.png";
-            case 4:
+            case 3:
                 return "/pizza.jpeg";
+            case 4:
+                return "/Burger2.jpeg";
             case 5:
-                return "/Burger2.PNG";
+                return "/fries.jpeg";
             case 6:
-                return "/Burger3.PNG";
+                return "/drinks.jpeg";
             case 7:
-                return "/Burger3.PNG";
-            case 8:
-                return "/Burger3.PNG";
+                return "/tenders.jpeg";
             default:
                 return "/Burger.PNG";
         }

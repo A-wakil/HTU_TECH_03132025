@@ -29,7 +29,8 @@ function AdTab() {
             <div className="ad-grid">
                 {ads.map((ad, index) => (
                     <AdCard 
-                        key={index} 
+                        key={index}
+                        id={index} 
                         name={ad.name} 
                         chartData={ad.chartData}
                         imageIndex={index}

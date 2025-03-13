@@ -1,8 +1,9 @@
 "use client"
 
+import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import Image from 'next/image';
-import "./AdView.css"; 
+import styles from "./AdView.css"
 import { TrendingUp } from "lucide-react"
 import { 
     Bar, 
@@ -22,7 +23,9 @@ import {
     PieChart, 
     Label,
     Cell,
-    ResponsiveContainer 
+    Tooltip,
+    ResponsiveContainer,
+    YAxis
 } from "recharts"
 import {
   Card,
@@ -44,6 +47,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/j_comp/dropdown-menu"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const browserData = [
   { browser: "chrome", visitors: 275, fill: "hsl(var(--chart-1))" },
@@ -54,12 +64,12 @@ const browserData = [
 ]
 
 const monthlyData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
   { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "Jun", desktop: 214, mobile: 140 },
 ]
 
 const chartConfig = {
@@ -73,9 +83,52 @@ const chartConfig = {
   },
 }
 
+const revenueData = [
+    { month: "Jan", value: 2400 },
+    { month: "Feb", value: 3600 },
+    { month: "Mar", value: 2800 },
+    { month: "Apr", value: 4200 },
+    { month: "May", value: 3800 },
+    { month: "Jun", value: 4600 }
+];
+
+const revenueChartConfig = {
+    Jan: { label: "Jan", color: "hsl(var(--chart-1))" },
+    Feb: { label: "Feb", color: "hsl(var(--chart-2))" },
+    Mar: { label: "Mar", color: "hsl(var(--chart-3))" },
+    Apr: { label: "Apr", color: "hsl(var(--chart-4))" },
+    May: { label: "May", color: "hsl(var(--chart-5))" },
+    Jun: { label: "Jun", color: "hsl(var(--chart-6))" }
+};
+
 function AdView({ adData, name }) {
   const router = useRouter();
   const totalVisitors = browserData.reduce((acc, curr) => acc + curr.visitors, 0);
+  const [activeRevenueMonth, setActiveRevenueMonth] = useState("Jun");
+  const activeIndex = revenueData.findIndex(item => item.month === activeRevenueMonth);
+
+    const getImagePath = () => {
+        switch(adData.id) {
+            case 0:
+                return "/Burger.PNG";
+            case 1:
+                return "/icecream.png";
+            case 2:
+                return "/cake.png";
+            case 3:
+                return "/pizza.jpeg";
+            case 4:
+                return "/Burger2.jpeg";
+            case 5:
+                return "/drinks.jpeg";
+            case 6:
+                return "/fries.jpeg";
+            case 7:
+                return "/tenders.jpeg";
+            default:
+                return "/Burger.PNG";
+        }
+    };
 
   const renderDot = (props) => {
     const { cx, cy, index } = props;
@@ -114,12 +167,12 @@ function AdView({ adData, name }) {
             <div className="ad-view-image">
                 <div className="image-container">
                     <Image 
-                        src="/Burger.PNG"
+                        src={getImagePath()}
                         alt={`${adData.name} preview`}
-                        width={400}
-                        height={300}
+                        fill
                         className="ad-image"
-                        style={{ objectFit: 'contain' }}
+                        style={{ objectFit: 'cover' }}  
+                        priority={true}
                     />
                 </div>
             </div>
@@ -170,44 +223,134 @@ function AdView({ adData, name }) {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Revenue Distribution</CardTitle>
-                        <CardDescription>Total Revenue: $30, 000</CardDescription>
+                <Card className={styles.metricCard}>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <div>
+                            <CardTitle>Revenue from Ads</CardTitle>
+                            <CardDescription>January - June 2024</CardDescription>
+                        </div>
+                        <Select value={activeRevenueMonth} onValueChange={setActiveRevenueMonth}>
+                            <SelectTrigger
+                                className="h-8 w-[130px] rounded-lg"
+                                aria-label="Select month"
+                            >
+                                <SelectValue placeholder="Select month" />
+                            </SelectTrigger>
+                            <SelectContent align="end" className="rounded-xl">
+                                {revenueData.map(({ month }) => (
+                                    
+                                    <SelectItem
+                                        key={month}
+
+                                        value={month}
+                                        className="rounded-lg [&_span]:flex"
+                                    >
+                                        <div className="flex items-center gap-2 text-xs">
+                                            <span
+                                                className="flex h-3 w-3 shrink-0 rounded-sm"
+                                                style={{
+                                                    backgroundColor: revenueChartConfig[month].color,
+                                                }}
+                                            />
+                                            {revenueChartConfig[month].label}
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={monthlyData}>
-                                    <CartesianGrid vertical={false} />
+                        <p className={styles.metricValue}>
+                            ${revenueData[activeIndex].value.toLocaleString()}
+                        </p>
+                        <div style={{ width: '100%', height: 300 }}>
+                            <ResponsiveContainer>
+                                <LineChart
+                                    data={revenueData}
+                                    margin={{
+                                        top: 5,
+                                        right: 20,
+                                        left: 20,
+                                        bottom: 25
+                                    }}
+                                >
+                                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
                                     <XAxis
                                         dataKey="month"
                                         tickLine={false}
                                         axisLine={false}
                                         tickMargin={8}
-                                        tickFormatter={(value) => value.slice(0, 3)}
+                                        interval={0}
                                     />
-                                    <ChartTooltip content={<ChartTooltipContent />} />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="desktop"
-                                        stackId="1"
-                                        stroke="hsl(var(--chart-1))"
-                                        fill="hsl(var(--chart-1))"
-                                        dot={renderDot}
+                                    <YAxis 
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={8}
                                     />
-                                    <Area
+                                    <Tooltip
+                                        cursor={false}
+                                        content={({ active, payload }) => {
+                                            if (active && payload && payload.length) {
+                                                return (
+                                                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <span className="text-sm font-bold">
+                                                                ${payload[0].value.toLocaleString()}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        }}
+                                    />
+                                    <Line
                                         type="monotone"
-                                        dataKey="mobile"
-                                        stackId="1"
+                                        dataKey="value"
                                         stroke="hsl(var(--chart-2))"
-                                        fill="hsl(var(--chart-2))"
-                                        dot={renderDot}
+                                        strokeWidth={2}
+                                        dot={(props) => {
+                                            const { cx, cy, index } = props;
+                                            return (
+                                                <circle
+                                                    key={`dot-${index}`}
+                                                    cx={cx}
+                                                    cy={cy}
+                                                    r={4}
+                                                    fill={`hsl(var(--chart-${index + 1}))`}
+                                                    stroke="hsl(var(--background))"
+                                                    strokeWidth={2}
+                                                />
+                                            );
+                                        }}
+                                        activeDot={(props) => {
+                                            const { cx, cy, index } = props;
+                                            return (
+                                                <circle
+                                                    key={`activeDot-${index}`}
+                                                    cx={cx}
+                                                    cy={cy}
+                                                    r={6}
+                                                    fill={`hsl(var(--chart-${index + 1}))`}
+                                                    stroke="hsl(var(--background))"
+                                                    strokeWidth={2}
+                                                />
+                                            );
+                                        }}
                                     />
-                                </AreaChart>
+                                </LineChart>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>
+                    <CardFooter className="flex-col gap-2 text-sm">
+                        <div className="flex items-center gap-2 font-medium leading-none">
+                            <TrendingUp className="h-4 w-4" />
+                            <span>12% from last month</span>
+                        </div>
+                        <div className="leading-none text-muted-foreground">
+                            Showing revenue from ads by month
+                        </div>
+                    </CardFooter>
                 </Card>
 
                 <Card>

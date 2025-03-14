@@ -21,7 +21,17 @@ Avata is an AI-powered digital advertising platform that helps businesses create
 ## Navigating the Application
 
 1. **Home Page (/)**: Analytics dashboard with key performance metrics and AI agent solutions overview
-2. **Ad Review (/review)**: Upload ad creatives to get AI-powered analysis and recommendations
+2. **GreenAds (/greenads)**: Track, analyze, and optimize your ads with real-time AI-powered insights.
+   - All Your Ads in One Place: View and manage your uploaded creatives effortlessly.
+   - Detailed Performance Metrics: See personalization scores, audience engagement, and effectiveness ratings for each ad.
+
+3. **Build (/build)**: Create high-performing ads effortlessly with AI-driven insights and recommendations.
+   - Seamless Uploads: Add any image, video, or document for instant analysis.
+   - Smart Context Integration: Provide details about your audience and campaign goals for precise targeting.
+   - Data-Driven Insights: Get personalization scores, audience alignment metrics, and strategic recommendations.
+   - AI-Powered Optimization: Chat with the AI to refine your ad, explore alternatives, and maximize impact.
+
+4. **Ad Review (/review)**: Upload ad creatives to get AI-powered analysis and recommendations
    - Upload any image, video, or document file
    - Add context about your target audience and campaign goals
    - Receive personalization scores, audience alignment metrics, and detailed insights

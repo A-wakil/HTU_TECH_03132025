@@ -273,20 +273,23 @@ Custom Details: ${customText || "None provided"}`;
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || isEnhancing}
-                className="w-full inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                className="w-full inline-flex h-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-lg ring-offset-background transition-all duration-200 hover:shadow-xl hover:from-blue-500 hover:to-indigo-500 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-blue-700/20"
               >
                 {isEnhancing ? (
                   <>
-                    <Sparkles className="mr-2 h-4 w-4 animate-pulse" />
+                    <Sparkles className="mr-2 h-5 w-5 animate-pulse text-blue-200" />
                     Enhancing Prompts...
                   </>
                 ) : isGenerating ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin text-blue-200" />
                     Generating...
                   </>
                 ) : (
-                  "Generate Ad Creatives"
+                  <>
+                    <Sparkles className="mr-2 h-5 w-5 text-blue-200" />
+                    Generate Ad Creatives
+                  </>
                 )}
               </button>
             </CardFooter>

@@ -193,7 +193,6 @@ function AdView({ adData, name }) {
     <div className="ad-view">
         <div className="ad-view-head">
             <button onClick={() => router.back()} className="back-button">⬅</button>
-            <h1>{adData.name}</h1>
             <DropdownMenu>
                 <DropdownMenuTrigger className="reiterate-button">
                     Re-iterate
@@ -416,10 +415,11 @@ function AdView({ adData, name }) {
                                         stroke="hsl(var(--chart-2))"
                                         strokeWidth={2}
                                         dot={(props) => {
-                                            const { cx, cy, index } = props;
+                                            const { cx, cy, index, payload } = props;
+                                            const uniqueKey = `dot-${payload.month}-${index}-${cx}-${cy}`;
                                             return (
                                                 <circle
-                                                    key={`dot-${index}`}
+                                                    key={uniqueKey}
                                                     cx={cx}
                                                     cy={cy}
                                                     r={4}
@@ -430,10 +430,11 @@ function AdView({ adData, name }) {
                                             );
                                         }}
                                         activeDot={(props) => {
-                                            const { cx, cy, index } = props;
+                                            const { cx, cy, index, payload } = props;
+                                            const uniqueKey = `activeDot-${payload.month}-${index}-${cx}-${cy}`;
                                             return (
                                                 <circle
-                                                    key={`activeDot-${index}`}
+                                                    key={uniqueKey}
                                                     cx={cx}
                                                     cy={cy}
                                                     r={6}

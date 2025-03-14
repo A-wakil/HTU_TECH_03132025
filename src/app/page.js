@@ -739,7 +739,7 @@ export default function Home() {
   );
 
   return (
-    <div className={styles.page}>
+    <div className="min-h-screen bg-[#f6f8fa]">
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.logoContainer}>

@@ -295,15 +295,17 @@ function App() {
             
             {/* Key Insights */}
             <div className={styles['insights-section']}>
-              <h3>Key Insights</h3>
               {reviewData.analysis.summary ? (
                 <div dangerouslySetInnerHTML={renderHTML(reviewData.analysis.summary)} />
               ) : (
-                <ul>
-                  {reviewData.analysis.keyInsights.map((insight, index) => (
-                    <li key={index}>{insight}</li>
-                  ))}
-                </ul>
+                <>
+                  <h3>Key Insights</h3>
+                  <ul>
+                    {reviewData.analysis.keyInsights.map((insight, index) => (
+                      <li key={index}>{insight}</li>
+                    ))}
+                  </ul>
+                </>
               )}
             </div>
             

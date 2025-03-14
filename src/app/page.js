@@ -789,6 +789,34 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <section className={styles.brandsShowcase}>
+        <div className={styles.sectionDivider}>
+          <span className={styles.dividerIcon}>🌿</span>
+        </div>
+        <h2 className={styles.brandsHeading}>Here are brands that cut their carbon footprint with Avata</h2>
+        
+        <div className={styles.brandsGrid}>
+          <div className={styles.brandLogo}>
+            <Image src="/brands/homedepot.png" alt="Home Depot" width={140} height={70} />
+          </div>
+          <div className={styles.brandLogo}>
+            <Image src="/brands/social.png" alt="Social Media Platform" width={140} height={70} />
+          </div>
+          <div className={styles.brandLogo}>
+            <Image src="/brands/netflix.png" alt="Netflix" width={140} height={70} />
+          </div>
+          <div className={styles.brandLogo}>
+            <Image src="/brands/ebay.png" alt="eBay" width={140} height={70} />
+          </div>
+          <div className={styles.brandLogo}>
+            <Image src="/brands/dell.png" alt="Dell" width={140} height={70} />
+          </div>
+          <div className={styles.brandLogo}>
+            <Image src="/brands/capitalone.svg.png" alt="Capital One" width={140} height={70} />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Avata - AI-Powered Ad Optimization Platform
 
-## Getting Started
+## What this application does
 
-First, run the development server:
+Avata is an AI-powered digital advertising platform that helps businesses create, review, and optimize their ad campaigns while reducing their carbon footprint. The platform offers:
+
+- **Analytics Dashboard**: Track revenue, conversion rates, ROI, and environmental impact metrics
+- **AI Agent Solutions**: Build, review, measure, and optimize ad content using AI assistants
+- **Ad Review Tool**: Get AI-powered insights and recommendations on ad creatives
+- **Carbon Footprint Tracking**: Monitor and reduce environmental impact of digital advertising
+
+## Tech Stack & Frameworks
+
+- **Frontend**: Next.js 14 (React), CSS Modules
+- **Backend**: Node.js with Express
+- **AI Integration**: OpenAI GPT-4o for ad analysis and content generation
+- **Data Visualization**: Recharts for interactive analytics dashboards
+- **Styling**: Custom CSS with responsive design principles
+- **File Handling**: Multer for file uploads and management
+
+## Navigating the Application
+
+1. **Home Page (/)**: Analytics dashboard with key performance metrics and AI agent solutions overview
+2. **Ad Review (/review)**: Upload ad creatives to get AI-powered analysis and recommendations
+   - Upload any image, video, or document file
+   - Add context about your target audience and campaign goals
+   - Receive personalization scores, audience alignment metrics, and detailed insights
+   - Chat with the AI for follow-up questions and additional recommendations
+
+## How to Run the Application
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+
+
+### Manual Setup
 
 ```bash
+# Clone the repository
+git clone https://github.com/A-wakil/HTU_TECH_03132025.git
+cd HTU_TECH_03132025
+
+# Install dependencies for both frontend and backend
+npm install
+
+# Create .env file with your Replica API key
+echo "REPLICATE_API_TOKEN=your_api_key_here" > .env
+
+# Create .env file with your Replica API key
+cd server
+echo "OPENAI_API_KEY=your_api_key_here" > .env
+cd ..
+
+# Start the development servers
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Start the backend server
+# In a different terminal window
+cd server
+node index.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Verifying Successful Startup
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+When the application starts successfully, you should see:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+   ▲ Next.js 15.2.2
+   - Local:        http://localhost:3000
+   - Network:      http://172.25.32.252:3000
+   - Environments: .env
 
-## Learn More
+ ✓ Starting...
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Front-end available at: http://localhost:3000
+Back-end API available at: http://localhost:5001
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Server running on port 5001
+```

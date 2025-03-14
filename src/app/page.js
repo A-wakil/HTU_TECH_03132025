@@ -24,7 +24,6 @@ import React from "react";
 import { Bar, BarChart } from "recharts";
 
 export default function Home() {
-  // Add sample data for each metric
   const revenueData = [
     { month: "Jan", value: 98000 },
     { month: "Feb", value: 105000 },

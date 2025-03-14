@@ -61,43 +61,10 @@ function AdCard({ id, name, chartData, imageIndex }) {
                     priority={true}
                 />
                 <div className="name-overlay">
-                    <h3>{name}</h3>
+                    {/* <h3>{name}</h3> */}
                 </div>
             
-                {/* <ChartContainer config={chartConfig}>
-                    <BarChart 
-                        width={200}  // Increased width
-                        height={120}  // Increased height
-                        data={chartData}
-                        margin={{
-                            top: 5,
-                            right: 5,
-                            left: 5,
-                            bottom: 5,
-                        }}
-                    >
-                        <CartesianGrid vertical={false} strokeWidth={0.5} />
-                        <XAxis
-                            dataKey="month"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={5}
-                            tick={{ fontSize: 10, fontWeight: 600 }}
-                        />
-                        <Bar 
-                            dataKey="desktop" 
-                            fill="hsl(var(--chart-1))" 
-                            radius={[2, 2, 0, 0]}
-                            strokeWidth={2}
-                        />
-                        <Bar 
-                            dataKey="mobile" 
-                            fill="hsl(var(--chart-2))" 
-                            radius={[2, 2, 0, 0]}
-                            strokeWidth={2}
-                        />
-                    </BarChart>
-                </ChartContainer> */}
+               
             </div>
         </div>
     )

@@ -9,7 +9,7 @@ export default function AdViewPage() {
 
     const adData = {
         id: adId,
-        name: `Ad ${adId}`,
+        name: `Ad ${adId +1}`,
         chartData: [
             { month: "Jan", desktop: Math.floor(Math.random() * 300) + 50, mobile: Math.floor(Math.random() * 200) + 50 },
             { month: "Feb", desktop: Math.floor(Math.random() * 300) + 50, mobile: Math.floor(Math.random() * 200) + 50 },
@@ -20,5 +20,5 @@ export default function AdViewPage() {
         ]
     }
 
-    return <AdView adData={adData} />
+    return <AdView adData={adData}  />
 }

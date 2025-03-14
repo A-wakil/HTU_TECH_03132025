@@ -24,7 +24,7 @@ function AdTab() {
     return(
         <main className="ad-tab">
             <div>
-                <h1>Ads</h1>
+                <h1 className="text-4xl font-extrabold mb-6">My Ads</h1>
             </div>
             <div className="ad-grid">
                 {ads.map((ad, index) => (

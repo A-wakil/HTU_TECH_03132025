@@ -49,82 +49,56 @@ app.post('/api/review-ad', upload.single('adFile'), async (req, res) => {
       
       const response = await openai.chat.completions.create({
         model: "gpt-4o", // Updated from gpt-4-vision-preview to gpt-4o which supports vision
+        response_format: { type: "json_object" }, // Enable JSON mode
         messages: [
           {
             role: "system",
             content: `You are an expert ad creative analyst for Avata. Analyze this ad image and provide detailed feedback on its effectiveness, personalization potential, audience alignment, and predicted performance. Include specific recommendations for improvement.
 
-IMPORTANT HTML FORMATTING INSTRUCTIONS:
-Your response MUST be valid, properly nested HTML that exactly follows this structure:
+Your response MUST be a properly formatted JSON object with the following structure:
 
-<div class="analysis-content">
-  <h3 class="section-title">Key Insights</h3>
-  
-  <div class="numbered-item">
-    <span class="item-number">1.</span> 
-    <strong>Category Name</strong>: Explanation text here
-  </div>
-  
-  <ul class="insight-list">
-    <li>Detail point 1</li>
-    <li>Detail point 2</li>
-  </ul>
-  
-  <div class="numbered-item">
-    <span class="item-number">2.</span> 
-    <strong>Another Category</strong>: Explanation text here
-  </div>
-  
-  <ul class="insight-list">
-    <li>Detail point 1</li>
-    <li>Detail point 2</li>
-  </ul>
-  
-  <h3 class="section-title">Recommendations for Improvement</h3>
-  
-  <div class="numbered-item">
-    <span class="item-number">1.</span> 
-    <strong>Recommendation Category</strong>: Specific recommendation
-  </div>
-  
-  <ul class="insight-list">
-    <li>Implementation detail 1</li>
-    <li>Implementation detail 2</li>
-  </ul>
-  
-  <div class="numbered-item">
-    <span class="item-number">2.</span> 
-    <strong>Second Recommendation</strong>: Another specific recommendation
-  </div>
-  
-  <ul class="insight-list">
-    <li>Implementation detail 1</li>
-    <li>Implementation detail 2</li>
-  </ul>
-</div>
+{
+  "analysis": {
+    "keyInsights": [
+      {
+        "category": "Visual Appeal",
+        "description": "The ad uses effective visual elements",
+        "details": [
+          "Strong imagery with vibrant colors",
+          "Good balance of text and visuals"
+        ]
+      },
+      {
+        "category": "Messaging",
+        "description": "The messaging connects with the audience",
+        "details": [
+          "Clear value proposition",
+          "Strong call to action"
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "category": "Visual Enhancement",
+        "description": "Improve specific visual elements",
+        "details": [
+          "Increase contrast between text and background",
+          "Use more authentic imagery"
+        ]
+      },
+      {
+        "category": "Message Clarity",
+        "description": "Enhance message clarity",
+        "details": [
+          "Simplify the main call to action",
+          "Make value proposition more prominent"
+        ]
+      }
+    ]
+  }
+}
 
-CRITICAL REQUIREMENTS:
-1. ALWAYS wrap your entire response in <div class="analysis-content"></div>
-2. ONLY use TWO section titles: "Key Insights" and "Recommendations for Improvement"
-3. NEVER duplicate section titles - only use ONE <h3> tag for "Key Insights" and ONE for "Recommendations"
-4. ALWAYS format each numbered point as <div class="numbered-item"><span class="item-number">N.</span> <strong>Category</strong>: Text</div>
-5. EVERY numbered item MUST be immediately followed by <ul class="insight-list"> with at least one <li> item
-6. All list items must be inside a <ul> tag - NEVER place <li> tags outside of a <ul> tag
-7. ALWAYS close all tags properly - every opening tag must have a matching closing tag
-8. COMPLETE all HTML elements - never leave a tag incomplete or broken
-9. End the response with proper closing tags - make sure the final </div> is included
-
-SAMPLE:
-<div class="analysis-content">
-  <h3 class="section-title">Key Insights</h3>
-  <div class="numbered-item"><span class="item-number">1.</span> <strong>Visual Appeal</strong>: Strong imagery</div>
-  <ul class="insight-list"><li>Detail 1</li><li>Detail 2</li></ul>
-  <h3 class="section-title">Recommendations for Improvement</h3>
-  <div class="numbered-item"><span class="item-number">1.</span> <strong>Recommendation</strong>: Suggestion</div>
-  <ul class="insight-list"><li>Detail 1</li></ul>
-</div>
-
-YOUR RESPONSE WILL BE DISPLAYED DIRECTLY IN THE UI WITH NO MODIFICATIONS.`
+Include at least 2-3 key insights and 2-3 recommendations, each with 2-3 specific details. Your JSON must be properly formatted with no syntax errors.`
           },
           {
             role: "user",
@@ -145,48 +119,81 @@ YOUR RESPONSE WILL BE DISPLAYED DIRECTLY IN THE UI WITH NO MODIFICATIONS.`
         max_tokens: 1000,
       });
       
-      analysisResult = response.choices[0].message.content;
-      
-      // Use our more robust rebuilding function
-      analysisResult = rebuildStructuredHTML(analysisResult);
+      try {
+        // Parse the JSON response directly
+        const jsonResponse = JSON.parse(response.choices[0].message.content);
+        analysisResult = jsonResponse;
+      } catch (jsonError) {
+        console.error('Error parsing JSON from API response:', jsonError);
+        // Fallback to string response if JSON parsing fails
+        analysisResult = { 
+          analysis: {
+            keyInsights: [
+              {
+                category: "Analysis Error",
+                description: "Could not parse the analysis result",
+                details: ["Please try again with a clearer image"]
+              }
+            ],
+            recommendations: []
+          }
+        };
+      }
       
     } else if (['.mp4', '.mov', '.avi', '.webm'].includes(fileExtension)) {
       fileType = 'video';
       // For videos, we'd need to provide instructions
-      analysisResult = "Video analysis requires manual review. Please describe your video content in the chat for AI-assisted feedback.";
+      analysisResult = {
+        analysis: {
+          keyInsights: [
+            {
+              category: "Video Analysis",
+              description: "Video analysis requires manual review",
+              details: ["Please describe your video content in the chat for AI-assisted feedback"]
+            }
+          ],
+          recommendations: []
+        }
+      };
       
     } else if (['.pdf', '.doc', '.docx'].includes(fileExtension)) {
       fileType = 'document';
       // For documents, provide instructions
-      analysisResult = "Document analysis requires text extraction. Please copy and paste the ad copy into the chat for AI-assisted feedback.";
+      analysisResult = {
+        analysis: {
+          keyInsights: [
+            {
+              category: "Document Analysis",
+              description: "Document analysis requires text extraction",
+              details: ["Please copy and paste the ad copy into the chat for AI-assisted feedback"]
+            }
+          ],
+          recommendations: []
+        }
+      };
     }
     
-    // Extract insights and recommendations from the analysis
-    const keyInsights = extractKeyInsights(analysisResult);
-    const recommendations = extractRecommendations(analysisResult);
-    
-    // Generate a personalization score (1-10)
+    // Generate scores based on the analysis
     const personalizationScore = generatePersonalizationScore(analysisResult);
-    
-    // Generate audience alignment score
     const audienceAlignment = generateAudienceAlignmentScore(analysisResult);
-    
-    // Generate predicted performance metrics
     const performanceMetrics = generatePerformanceMetrics(analysisResult);
+    
+    // Generate HTML for display
+    const htmlAnalysis = generateHTMLFromAnalysis(analysisResult);
     
     // Structure the response
     const result = {
       reviewId: `review-${Date.now()}`,
       fileType,
       analysis: {
-        summary: analysisResult,
-        keyInsights,
-        recommendations,
+        summary: htmlAnalysis,
+        keyInsights: extractKeyInsights(analysisResult),
+        recommendations: extractRecommendations(analysisResult),
         audienceAlignment,
         personalizationScore,
         predictedPerformanceMetrics: performanceMetrics
       },
-      summary: extractFirstSentence(analysisResult)
+      summary: extractFirstSentence(htmlAnalysis)
     };
     
     return res.status(200).json(result);
@@ -209,74 +216,67 @@ app.post('/api/review-chat', async (req, res) => {
     // Get response from OpenAI
     const response = await openai.chat.completions.create({
       model: "gpt-4o", // Updated from gpt-4 to gpt-4o
+      response_format: { type: "json_object" }, // Enable JSON mode
       messages: [
         {
           role: "system",
           content: `You are an expert ad creative analyst for Avata. You've previously analyzed an ad and provided feedback. 
                     The original ad context was: "${adContext}". 
-                    Your analysis found these key insights: "${reviewData.analysis.keyInsights.join(', ')}".
+                    Your analysis found these key insights: "${JSON.stringify(reviewData.analysis.keyInsights)}".
                     Now answer the user's follow-up question about this ad review.
                     
-IMPORTANT HTML FORMATTING INSTRUCTIONS:
-Your response MUST be valid, properly nested HTML that exactly follows this structure:
+Return your response as a properly formatted JSON object with the following structure:
 
-<div class="analysis-content">
-  <h3 class="section-title">Response to Your Question</h3>
-  
-  <div class="numbered-item">
-    <span class="item-number">1.</span> 
-    <strong>Category Name</strong>: Explanation text here
-  </div>
-  
-  <ul class="insight-list">
-    <li>Detail point 1</li>
-    <li>Detail point 2</li>
-  </ul>
-  
-  <div class="numbered-item">
-    <span class="item-number">2.</span> 
-    <strong>Another Category</strong>: Explanation text here
-  </div>
-  
-  <ul class="insight-list">
-    <li>Detail point 1</li>
-    <li>Detail point 2</li>
-  </ul>
-</div>
+{
+  "response": {
+    "points": [
+      {
+        "category": "Response Category",
+        "description": "Main response point",
+        "details": [
+          "Detail point 1",
+          "Detail point 2"
+        ]
+      },
+      {
+        "category": "Another Category",
+        "description": "Second main point",
+        "details": [
+          "Detail point 1",
+          "Detail point 2"
+        ]
+      }
+    ]
+  }
+}
 
-CRITICAL REQUIREMENTS:
-1. ALWAYS wrap your entire response in <div class="analysis-content"></div>
-2. ONLY use ONE section title: "Response to Your Question"
-3. NEVER duplicate section titles
-4. ALWAYS format each numbered point as <div class="numbered-item"><span class="item-number">N.</span> <strong>Category</strong>: Text</div>
-5. EVERY numbered item MUST be immediately followed by <ul class="insight-list"> with at least one <li> item
-6. All list items must be inside a <ul> tag - NEVER place <li> tags outside of a <ul> tag
-7. ALWAYS close all tags properly - every opening tag must have a matching closing tag
-8. COMPLETE all HTML elements - never leave a tag incomplete or broken
-9. End the response with proper closing tags - make sure the final </div> is included
-
-SAMPLE:
-<div class="analysis-content">
-  <h3 class="section-title">Response to Your Question</h3>
-  <div class="numbered-item"><span class="item-number">1.</span> <strong>Visual Appeal</strong>: Strong imagery</div>
-  <ul class="insight-list"><li>Detail 1</li><li>Detail 2</li></ul>
-  <div class="numbered-item"><span class="item-number">2.</span> <strong>Second Point</strong>: Additional info</div>
-  <ul class="insight-list"><li>Detail 1</li></ul>
-</div>
-
-YOUR RESPONSE WILL BE DISPLAYED DIRECTLY IN THE UI WITH NO MODIFICATIONS.`
+Include at least 1-2 response points, each with 2-3 specific details. Your JSON must be properly formatted with no syntax errors.`
         },
         { role: "user", content: message }
       ],
-      max_tokens: 500,
+      max_tokens: 1000,
     });
     
-    let reply = response.choices[0].message.content;
-    
-    // Use our more robust rebuilding function
-    reply = rebuildStructuredHTML(reply);
-    
-    return res.status(200).json({ reply });
+    try {
+      // Parse the JSON response directly
+      const jsonResponse = JSON.parse(response.choices[0].message.content);
+      
+      // Convert JSON to HTML
+      const htmlReply = generateHTMLFromChatResponse(jsonResponse);
+      
+      return res.status(200).json({ reply: htmlReply });
+      
+    } catch (jsonError) {
+      console.error('Error parsing JSON from API chat response:', jsonError);
+      // Fallback for parsing errors
+      return res.status(200).json({ 
+        reply: `<div class="analysis-content">
+          <h3 class="section-title">Response to Your Question</h3>
+          <div class="numbered-item"><span class="item-number">1.</span> <strong>Processing Error</strong>: I couldn't process that properly</div>
+          <ul class="insight-list"><li>Please try rephrasing your question</li><li>You can ask something more specific about the ad</li></ul>
+        </div>`
+      });
+    }
     
   } catch (error) {
     console.error('Error in review chat:', error);
@@ -285,133 +285,73 @@ YOUR RESPONSE WILL BE DISPLAYED DIRECTLY IN THE UI WITH NO MODIFICATIONS.`
 });
 
 // Helper functions
-function extractKeyInsights(text) {
-  const insights = [];
-  
-  // Look for sections titled "Key Insights", "Insights", "Key Observations", etc.
-  const sections = text.split(/#+\s+|(\n|^)([A-Za-z\s]+):\s*\n/);
-  
-  for (let i = 0; i < sections.length; i++) {
-    const section = sections[i];
-    if (!section) continue;
-    
-    if (
-      section.toLowerCase().includes('key insight') || 
-      section.toLowerCase().includes('insight') ||
-      section.toLowerCase().includes('observation')
-    ) {
-      // Get the content of this section (next item in array)
-      const content = sections[i + 1];
-      if (content) {
-        // Split by bullet points or numbered lists
-        const points = content.split(/\n-|\n\d+\.|\n\*/).filter(Boolean);
-        points.forEach(point => {
-          insights.push(point.trim());
-        });
-      }
-    }
+
+// Extract key insights from the JSON analysis
+function extractKeyInsights(analysisResult) {
+  if (!analysisResult || !analysisResult.analysis || !analysisResult.analysis.keyInsights) {
+    return ["The ad has some effective elements but could be more personalized.", 
+            "The visual hierarchy could be improved for better user engagement.", 
+            "The call-to-action could be more compelling."];
   }
   
-  // If no structured insights found, extract sentences with key terms
-  if (insights.length === 0) {
-    const sentences = text.split(/[.!?]+/);
-    for (const sentence of sentences) {
-      if (
-        sentence.toLowerCase().includes('effective') ||
-        sentence.toLowerCase().includes('audience') ||
-        sentence.toLowerCase().includes('appeal') ||
-        sentence.toLowerCase().includes('strength')
-      ) {
-        insights.push(sentence.trim());
-      }
-      if (insights.length >= 3) break;
-    }
-  }
-  
-  return insights.length > 0 ? insights : ["The ad has some effective elements but could be more personalized.", "The visual hierarchy could be improved for better user engagement.", "The call-to-action could be more compelling."];
+  return analysisResult.analysis.keyInsights.map(insight => 
+    `${insight.category}: ${insight.description}`
+  );
 }
 
-function extractRecommendations(text) {
-  const recommendations = [];
-  
-  // Look for sections titled "Recommendations", "Suggestions", etc.
-  const sections = text.split(/#+\s+|(\n|^)([A-Za-z\s]+):\s*\n/);
-  
-  for (let i = 0; i < sections.length; i++) {
-    const section = sections[i];
-    if (!section) continue;
-    
-    if (
-      section.toLowerCase().includes('recommend') || 
-      section.toLowerCase().includes('suggestion') ||
-      section.toLowerCase().includes('improvement')
-    ) {
-      // Get the content of this section (next item in array)
-      const content = sections[i + 1];
-      if (content) {
-        // Split by bullet points or numbered lists
-        const points = content.split(/\n-|\n\d+\.|\n\*/).filter(Boolean);
-        points.forEach(point => {
-          recommendations.push(point.trim());
-        });
-      }
-    }
+// Extract recommendations from the JSON analysis
+function extractRecommendations(analysisResult) {
+  if (!analysisResult || !analysisResult.analysis || !analysisResult.analysis.recommendations) {
+    return ["Add more personalized elements targeted to your specific audience.", 
+            "Strengthen the call-to-action with clear value proposition.", 
+            "Use more specific messaging that addresses customer pain points."];
   }
   
-  // If no structured recommendations found, extract sentences with recommendation terms
-  if (recommendations.length === 0) {
-    const sentences = text.split(/[.!?]+/);
-    for (const sentence of sentences) {
-      if (
-        sentence.toLowerCase().includes('should') ||
-        sentence.toLowerCase().includes('could') ||
-        sentence.toLowerCase().includes('recommend') ||
-        sentence.toLowerCase().includes('consider')
-      ) {
-        recommendations.push(sentence.trim());
-      }
-      if (recommendations.length >= 3) break;
-    }
-  }
-  
-  return recommendations.length > 0 ? recommendations : ["Add more personalized elements targeted to your specific audience.", "Strengthen the call-to-action with clear value proposition.", "Use more specific messaging that addresses customer pain points."];
+  return analysisResult.analysis.recommendations.map(rec => 
+    `${rec.category}: ${rec.description}`
+  );
 }
 
-function generatePersonalizationScore(text) {
-  // Calculate a personalization score based on the analysis text
-  let score = 5; // Default middle score
-  
-  // Positive indicators
-  const positiveTerms = [
-    'personalized', 'tailored', 'specific', 'targeted', 'customized',
-    'relevant', 'individual', 'demographic', 'segment'
-  ];
-  
-  // Negative indicators
-  const negativeTerms = [
-    'generic', 'general', 'broad', 'vague', 'unspecific',
-    'impersonal', 'bland', 'standard', 'conventional'
-  ];
-  
-  // Analyze text for indicators
-  for (const term of positiveTerms) {
-    if (text.toLowerCase().includes(term)) {
-      score += 0.5;
-    }
-  }
-  
-  for (const term of negativeTerms) {
-    if (text.toLowerCase().includes(term)) {
-      score -= 0.5;
-    }
-  }
-  
-  // Cap score between 1-10
-  score = Math.max(1, Math.min(10, Math.round(score)));
-  
-  // Generate improvement suggestions based on score
+// Generate personalization score based on analysis
+function generatePersonalizationScore(analysisResult) {
+  // Default middle score
+  let score = 5;
   let potentialImprovements = [];
   
+  if (analysisResult && analysisResult.analysis) {
+    // Check insights and recommendations for personalization indicators
+    const allText = JSON.stringify(analysisResult);
+    
+    // Positive indicators
+    const positiveTerms = [
+      'personalized', 'tailored', 'specific', 'targeted', 'customized',
+      'relevant', 'individual', 'demographic', 'segment'
+    ];
+    
+    // Negative indicators
+    const negativeTerms = [
+      'generic', 'general', 'broad', 'vague', 'unspecific',
+      'impersonal', 'bland', 'standard', 'conventional'
+    ];
+    
+    // Analyze text for indicators
+    for (const term of positiveTerms) {
+      if (allText.toLowerCase().includes(term)) {
+        score += 0.5;
+      }
+    }
+    
+    for (const term of negativeTerms) {
+      if (allText.toLowerCase().includes(term)) {
+        score -= 0.5;
+      }
+    }
+    
+    // Cap score between 1-10
+    score = Math.max(1, Math.min(10, Math.round(score)));
+  }
+  
+  // Generate improvement suggestions based on score
   if (score < 5) {
     potentialImprovements = [
       "Add personalized elements specific to your target audience",
@@ -436,37 +376,43 @@ function generatePersonalizationScore(text) {
   };
 }
 
-function generateAudienceAlignmentScore(text) {
-  // Generate audience alignment score based on analysis text
-  let score = 5; // Default middle score
+// Generate audience alignment score based on analysis
+function generateAudienceAlignmentScore(analysisResult) {
+  // Default middle score
+  let score = 5;
   
-  // Positive indicators
-  const positiveTerms = [
-    'align', 'target audience', 'demographic', 'resonates', 'speaks to',
-    'appeals to', 'relevant to', 'matches', 'appropriate'
-  ];
-  
-  // Negative indicators
-  const negativeTerms = [
-    'misaligned', 'disconnect', 'irrelevant', 'inappropriate', 'mismatch',
-    'wrong audience', 'doesn\'t resonate', 'doesn\'t appeal'
-  ];
-  
-  // Analyze text for indicators
-  for (const term of positiveTerms) {
-    if (text.toLowerCase().includes(term)) {
-      score += 0.5;
+  if (analysisResult && analysisResult.analysis) {
+    // Check insights and recommendations for audience alignment indicators
+    const allText = JSON.stringify(analysisResult);
+    
+    // Positive indicators
+    const positiveTerms = [
+      'align', 'target audience', 'demographic', 'resonates', 'speaks to',
+      'appeals to', 'relevant to', 'matches', 'appropriate'
+    ];
+    
+    // Negative indicators
+    const negativeTerms = [
+      'misaligned', 'disconnect', 'irrelevant', 'inappropriate', 'mismatch',
+      'wrong audience', 'doesn\'t resonate', 'doesn\'t appeal'
+    ];
+    
+    // Analyze text for indicators
+    for (const term of positiveTerms) {
+      if (allText.toLowerCase().includes(term)) {
+        score += 0.5;
+      }
     }
-  }
-  
-  for (const term of negativeTerms) {
-    if (text.toLowerCase().includes(term)) {
-      score -= 1;
+    
+    for (const term of negativeTerms) {
+      if (allText.toLowerCase().includes(term)) {
+        score -= 1;
+      }
     }
+    
+    // Cap score between 1-10
+    score = Math.max(1, Math.min(10, Math.round(score)));
   }
-  
-  // Cap score between 1-10
-  score = Math.max(1, Math.min(10, Math.round(score)));
   
   // Determine category
   let category;
@@ -486,29 +432,34 @@ function generateAudienceAlignmentScore(text) {
   };
 }
 
-function generatePerformanceMetrics(text) {
+// Generate performance metrics based on analysis
+function generatePerformanceMetrics(analysisResult) {
   // Sentiment analysis to determine predicted performance
   let sentiment = 0;
   
-  const positiveTerms = [
-    'effective', 'strong', 'compelling', 'clear', 'engaging',
-    'successful', 'impactful', 'powerful', 'attention-grabbing'
-  ];
-  
-  const negativeTerms = [
-    'weak', 'confusing', 'unclear', 'ineffective', 'poor',
-    'problematic', 'inconsistent', 'forgettable', 'bland'
-  ];
-  
-  for (const term of positiveTerms) {
-    if (text.toLowerCase().includes(term)) {
-      sentiment += 0.5;
+  if (analysisResult && analysisResult.analysis) {
+    const allText = JSON.stringify(analysisResult);
+    
+    const positiveTerms = [
+      'effective', 'strong', 'compelling', 'clear', 'engaging',
+      'successful', 'impactful', 'powerful', 'attention-grabbing'
+    ];
+    
+    const negativeTerms = [
+      'weak', 'confusing', 'unclear', 'ineffective', 'poor',
+      'problematic', 'inconsistent', 'forgettable', 'bland'
+    ];
+    
+    for (const term of positiveTerms) {
+      if (allText.toLowerCase().includes(term)) {
+        sentiment += 0.5;
+      }
     }
-  }
-  
-  for (const term of negativeTerms) {
-    if (text.toLowerCase().includes(term)) {
-      sentiment -= 0.5;
+    
+    for (const term of negativeTerms) {
+      if (allText.toLowerCase().includes(term)) {
+        sentiment -= 0.5;
+      }
     }
   }
   
@@ -548,563 +499,96 @@ function generatePerformanceMetrics(text) {
   };
 }
 
-// Add this new helper function to format the analysis with HTML
-function formatAnalysisWithHTML(text) {
-  // First, standardize line breaks
-  let formattedText = text.replace(/\r\n/g, '\n');
+// Function to generate HTML from JSON analysis
+function generateHTMLFromAnalysis(analysisResult) {
+  if (!analysisResult || !analysisResult.analysis) {
+    return '<div class="analysis-content"><p>Analysis could not be processed.</p></div>';
+  }
   
-  // Replace markdown headers with HTML headers
-  formattedText = formattedText.replace(/### (.*)/g, '<h3 class="section-title">$1</h3>');
-  formattedText = formattedText.replace(/## (.*)/g, '<h3 class="section-title">$1</h3>');
+  let html = '<div class="analysis-content">';
   
-  // Handle numbered lists with bold headings (like "1. **Visual Appeal**:")
-  formattedText = formattedText.replace(/(\d+)\.\s+\*\*(.*?)\*\*:/g, '<div class="numbered-item"><span class="item-number">$1.</span> <strong>$2</strong>:</div>');
-  formattedText = formattedText.replace(/(\d+)\.\s+\*\*(.*?)\*\*/g, '<div class="numbered-item"><span class="item-number">$1.</span> <strong>$2</strong></div>');
+  // Key Insights Section
+  html += '<h3 class="section-title">Key Insights</h3>';
   
-  // Handle regular numbered list items
-  formattedText = formattedText.replace(/(\d+)\.\s+(.*?)(?=\n|$)/g, '<li class="numbered-list-item"><span class="item-number">$1.</span> $2</li>');
+  if (analysisResult.analysis.keyInsights && analysisResult.analysis.keyInsights.length > 0) {
+    analysisResult.analysis.keyInsights.forEach((insight, index) => {
+      html += `<div class="numbered-item">
+        <span class="item-number">${index + 1}.</span> 
+        <strong>${insight.category}</strong>: ${insight.description}
+      </div>
+      <ul class="insight-list">`;
+      
+      if (insight.details && insight.details.length > 0) {
+        insight.details.forEach(detail => {
+          html += `<li>${detail}</li>`;
+        });
+      }
+      
+      html += '</ul>';
+    });
+  }
   
-  // Replace bullet points with proper HTML list items
-  formattedText = formattedText.replace(/\n\s*-\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
+  // Recommendations Section
+  html += '<h3 class="section-title">Recommendations for Improvement</h3>';
   
-  // Format bold text (often used for subsections like "Visual Appeal")
-  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  if (analysisResult.analysis.recommendations && analysisResult.analysis.recommendations.length > 0) {
+    analysisResult.analysis.recommendations.forEach((rec, index) => {
+      html += `<div class="numbered-item">
+        <span class="item-number">${index + 1}.</span> 
+        <strong>${rec.category}</strong>: ${rec.description}
+      </div>
+      <ul class="insight-list">`;
+      
+      if (rec.details && rec.details.length > 0) {
+        rec.details.forEach(detail => {
+          html += `<li>${detail}</li>`;
+        });
+      }
+      
+      html += '</ul>';
+    });
+  }
   
-  // Wrap list items in unordered lists, being careful not to nest them improperly
-  formattedText = formattedText.replace(/(<li>.*?<\/li>)(\s*)(<li>.*?<\/li>)*/gs, (match) => {
-    return `<ul class="insight-list">${match}</ul>`;
+  html += '</div>';
+  return html;
+}
+
+// Function to generate HTML from chat JSON response
+function generateHTMLFromChatResponse(jsonResponse) {
+  if (!jsonResponse || !jsonResponse.response || !jsonResponse.response.points) {
+    return '<div class="analysis-content"><p>Response could not be processed.</p></div>';
+  }
+  
+  let html = '<div class="analysis-content">';
+  html += '<h3 class="section-title">Response to Your Question</h3>';
+  
+  jsonResponse.response.points.forEach((point, index) => {
+    html += `<div class="numbered-item">
+      <span class="item-number">${index + 1}.</span> 
+      <strong>${point.category}</strong>: ${point.description}
+    </div>
+    <ul class="insight-list">`;
+    
+    if (point.details && point.details.length > 0) {
+      point.details.forEach(detail => {
+        html += `<li>${detail}</li>`;
+      });
+    }
+    
+    html += '</ul>';
   });
   
-  // Wrap numbered list items in ordered lists
-  formattedText = formattedText.replace(/(<li class="numbered-list-item">.*?<\/li>)(\s*)(<li class="numbered-list-item">.*?<\/li>)*/gs, (match) => {
-    return `<ol class="recommendation-list">${match}</ol>`;
-  });
-  
-  // Add proper paragraph tags to text blocks, avoiding wrapping HTML elements
-  const paragraphs = formattedText.split(/\n\s*\n/);
-  formattedText = paragraphs.map(p => {
-    // Skip if it's already an HTML element
-    if (p.trim().startsWith('<') && !p.trim().startsWith('<strong>')) {
-      return p;
-    }
-    // Skip empty paragraphs
-    if (!p.trim()) {
-      return '';
-    }
-    return `<p>${p.trim()}</p>`;
-  }).join('\n\n');
-  
-  // Clean up any double or empty paragraph tags
-  formattedText = formattedText.replace(/<p>\s*<\/p>/g, '');
-  formattedText = formattedText.replace(/<p>\s*(<h\d|<ul|<ol|<div)/g, '$1');
-  formattedText = formattedText.replace(/(<\/h\d>|<\/ul>|<\/ol>|<\/div>)\s*<\/p>/g, '$1');
-  
-  // Add a wrapper div for the whole analysis
-  formattedText = `<div class="analysis-content">${formattedText}</div>`;
-  
-  return formattedText;
+  html += '</div>';
+  return html;
 }
 
-// Replace the existing sanitizeHTML function with this more robust implementation
-function sanitizeHTML(html) {
-  if (!html) return '<div class="analysis-content"><p>No content available</p></div>';
-  
-  // Step 1: Normalize the HTML by removing extra spaces and line breaks
-  let cleanHTML = html.trim().replace(/\s+/g, ' ');
-  
-  // Step 2: Ensure the content is wrapped in the main container
-  if (!cleanHTML.includes('<div class="analysis-content">')) {
-    cleanHTML = `<div class="analysis-content">${cleanHTML}</div>`;
-  }
-  
-  // Step 3: Fix common structural issues
-  
-  // Ensure section titles use the correct format
-  cleanHTML = cleanHTML.replace(/<h\d[^>]*>(.*?)<\/h\d>/gi, '<h3 class="section-title">$1</h3>');
-  
-  // Fix incomplete numbered items
-  cleanHTML = cleanHTML.replace(
-    /<div class="numbered-item">\s*<span class="item-number">(\d+)(?!\.)<\/span>/g, 
-    '<div class="numbered-item"><span class="item-number">$1.</span>'
-  );
-  
-  // Ensure every numbered item has proper opening and closing tags
-  cleanHTML = cleanHTML.replace(
-    /<div class="numbered-item">(.*?)(?=<div class="numbered-item">|<h3|$)/gs, 
-    (match, content) => {
-      if (!match.includes('</div>')) {
-        return `<div class="numbered-item">${content}</div>`;
-      }
-      return match;
-    }
-  );
-  
-  // Step 4: Enforce list structure
-  
-  // Ensure every numbered item is followed by a list if not already
-  cleanHTML = cleanHTML.replace(
-    /<\/div>(\s*)(?!<ul|<\/div>|<div|<h3)/g,
-    '</div><ul class="insight-list"><li>Details not provided</li></ul>'
-  );
-  
-  // Fix list items outside of lists
-  cleanHTML = cleanHTML.replace(/<li>(.*?)<\/li>(?!\s*<\/ul>)/g, '<li>$1</li></ul>');
-  
-  // Ensure all lists have opening tags
-  cleanHTML = cleanHTML.replace(
-    /(?<!<ul[^>]*>)<li>/g,
-    '<ul class="insight-list"><li>'
-  );
-  
-  // Ensure all lists have closing tags
-  cleanHTML = cleanHTML.replace(/<\/li>(?!\s*(<li>|<\/ul>))/g, '</li></ul>');
-  
-  // Step 5: Apply final structure check
-  
-  // Ensure all elements are properly closed by checking tag balance
-  const openTags = (cleanHTML.match(/<div|<ul|<li|<h3/g) || []).length;
-  const closeTags = (cleanHTML.match(/<\/div>|<\/ul>|<\/li>|<\/h3>/g) || []).length;
-  
-  if (openTags > closeTags) {
-    // Add missing closing tags
-    const diff = openTags - closeTags;
-    for (let i = 0; i < diff; i++) {
-      if (cleanHTML.lastIndexOf('<div') > cleanHTML.lastIndexOf('</div>')) {
-        cleanHTML += '</div>';
-      } else if (cleanHTML.lastIndexOf('<ul') > cleanHTML.lastIndexOf('</ul>')) {
-        cleanHTML += '</ul>';
-      } else if (cleanHTML.lastIndexOf('<li') > cleanHTML.lastIndexOf('</li>')) {
-        cleanHTML += '</li>';
-      } else if (cleanHTML.lastIndexOf('<h3') > cleanHTML.lastIndexOf('</h3>')) {
-        cleanHTML += '</h3>';
-      }
-    }
-  }
-  
-  // Step 6: Ensure proper nesting pattern for the analysis structure
-  // This enforces the pattern: h3 -> numbered-item -> insight-list
-  
-  // Make sure ul.insight-list follows div.numbered-item
-  cleanHTML = cleanHTML.replace(
-    /<div class="numbered-item">(.*?)<\/div>(?!\s*<ul)/g,
-    '<div class="numbered-item">$1</div><ul class="insight-list"><li>Additional details not provided</li></ul>'
-  );
-  
-  // Ensure the main container is closed
-  if (!cleanHTML.endsWith('</div>')) {
-    cleanHTML += '</div>';
-  }
-  
-  return cleanHTML;
-}
-
-// After the sanitizeHTML function, add this validation function
-function validateAndFixHTML(html, rawContent) {
-  // First pass through our sanitizer
-  let sanitized = sanitizeHTML(html);
-  
-  // Step 1: Fix duplicate section headers (specifically looking for duplicate "Key Insights")
-  sanitized = sanitized.replace(
-    /(<h3 class="section-title">Key Insights<\/h3>)(.*?)(<h3 class="section-title">Key Insights<\/h3>)/gs,
-    '$1$2'
-  );
-  
-  // Step 2: Remove all "Details not provided" placeholders
-  sanitized = sanitized.replace(/<li>Details not provided<\/li>/g, '');
-  
-  // Step 3: Fix broken recommendation sections
-  // This specifically targets the pattern we're seeing in the problematic output
-  sanitized = sanitized.replace(
-    /<\/li>\s*<\/ul>\s*<h3 class="section-title">Recommendations[^<]*<\/h3>\s*<div class="numbered-item">\s*<span class="item-number">1(\s*<|[^<]*)/g,
-    '</li></ul><h3 class="section-title">Recommendations for Improvement</h3><div class="numbered-item"><span class="item-number">1.</span>'
-  );
-  
-  // Step 4: Fix orphaned list items
-  sanitized = sanitized.replace(
-    /<\/li><\/ul>\s*<ul class="insight-list"><li>/g,
-    '</li><li>'
-  );
-  
-  // Step 5: Fix standalone list items
-  const standaloneListItemPattern = /<\/div>.*?<li>(.*?)<\/li>/gs;
-  if (standaloneListItemPattern.test(sanitized)) {
-    sanitized = sanitized.replace(
-      standaloneListItemPattern,
-      '</div><ul class="insight-list"><li>$1</li></ul>'
-    );
-  }
-  
-  // Step 6: Handle broken fragments at the end of the content
-  // First, check if we have a broken fragment
-  if (sanitized.match(/<span class="item-number">\d+[^<]*$/) || 
-      sanitized.match(/<div class="numbered-item">[^<]*$/) ||
-      sanitized.match(/<li>[^<]*$/)) {
-    
-    // Remove the broken fragment
-    sanitized = sanitized.replace(/<span class="item-number">\d+[^<]*$/, '');
-    sanitized = sanitized.replace(/<div class="numbered-item">[^<]*$/, '');
-    sanitized = sanitized.replace(/<li>[^<]*$/, '');
-    
-    // Ensure we have proper closing tags
-    if (!sanitized.endsWith('</div>')) {
-      sanitized = ensureProperClosingTags(sanitized);
-    }
-  }
-  
-  // Check if the resulting HTML has the required structure
-  const hasMainContainer = sanitized.includes('<div class="analysis-content">') && sanitized.includes('</div>');
-  const hasSectionTitle = sanitized.includes('<h3 class="section-title">') && sanitized.includes('</h3>');
-  const hasNumberedItem = sanitized.includes('<div class="numbered-item">') && 
-                          sanitized.includes('<span class="item-number">') && 
-                          sanitized.includes('</div>');
-  const hasInsightList = sanitized.includes('<ul class="insight-list">') && 
-                         sanitized.includes('<li>') && 
-                         sanitized.includes('</ul>');
-  
-  // If any of these critical structures are missing, create a structured fallback
-  if (!hasMainContainer || !hasSectionTitle || !hasNumberedItem || !hasInsightList) {
-    console.warn("HTML validation failed, using structured fallback");
-    
-    // Extract meaningful content from the raw text
-    const cleanText = rawContent.replace(/<[^>]*>/g, '').trim();
-    const sentences = cleanText.split(/\.\s+/);
-    
-    // Take the first sentence as a summary
-    const summary = sentences[0] || "Analysis completed";
-    
-    // Create a properly structured fallback
-    return `
-<div class="analysis-content">
-  <h3 class="section-title">Analysis Summary</h3>
-  
-  <div class="numbered-item">
-    <span class="item-number">1.</span> 
-    <strong>Overview</strong>: ${summary}
-  </div>
-  
-  <ul class="insight-list">
-    <li>Analysis details have been processed but couldn't be displayed in the required format</li>
-    <li>The complete analysis is available and has been processed by the system</li>
-  </ul>
-  
-  <div class="numbered-item">
-    <span class="item-number">2.</span> 
-    <strong>Further Information</strong>: Try asking a follow-up question for more details
-  </div>
-  
-  <ul class="insight-list">
-    <li>You can ask for specific aspects of the analysis</li>
-    <li>Detailed insights are available through the chat interface</li>
-  </ul>
-</div>`;
-  }
-  
-  return sanitized;
-}
-
-// Add a helper function to ensure proper closing tags
-function ensureProperClosingTags(html) {
-  let result = html;
-  
-  // Get the last div.numbered-item
-  const lastNumberedItemMatch = result.match(/<div class="numbered-item">[^<]*<span class="item-number">\d+\.<\/span>\s*<strong>[^<]*<\/strong>[^<]*<\/div>\s*(<ul class="insight-list">.*?<\/ul>)?/gs);
-  
-  if (lastNumberedItemMatch) {
-    const lastNumberedItem = lastNumberedItemMatch[lastNumberedItemMatch.length - 1];
-    
-    // Check if it has a ul.insight-list
-    if (!lastNumberedItem.includes('<ul class="insight-list">')) {
-      // Add an empty ul.insight-list
-      const insertionPoint = result.lastIndexOf('</div>');
-      if (insertionPoint !== -1) {
-        result = result.substring(0, insertionPoint) + 
-                 '</div><ul class="insight-list"><li>Additional information not available</li></ul>' + 
-                 result.substring(insertionPoint + 6); // +6 to account for '</div>'
-      }
-    }
-  }
-  
-  // Ensure the main container is closed
-  if (!result.endsWith('</div>')) {
-    result += '</div>';
-  }
-  
-  return result;
-}
-
-// Add a helper function to extract the first sentence
+// Extract first sentence for summary
 function extractFirstSentence(html) {
   // Remove HTML tags to get plain text
   const plainText = html.replace(/<[^>]*>/g, '');
   // Extract the first sentence
   const match = plainText.match(/^([^.!?]+[.!?])/);
   return match ? match[0].trim() : plainText.substring(0, 100) + '...';
-}
-
-// Add parsing and rebuilding functions after validateAndFixHTML
-function rebuildStructuredHTML(html) {
-  // First try with our regex-based sanitizer
-  let result = validateAndFixHTML(html, html);
-  
-  // If we still have issues, use a more drastic approach to rebuild the HTML
-  if (hasHtmlIssues(result)) {
-    console.log("Using deep HTML reconstruction...");
-    
-    // Extract text content from the HTML
-    const plainText = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-    
-    // Extract possible sections, categories and points
-    const sections = extractSections(html);
-    const insights = extractKeyPointsFromHtml(html);
-    const recommendations = extractRecommendationsFromHtml(html);
-    
-    // Rebuild the HTML structure from scratch
-    result = buildCleanHtmlStructure(sections, insights, recommendations, plainText);
-  }
-  
-  return result;
-}
-
-// Helper functions for rebuilding structured HTML
-function hasHtmlIssues(html) {
-  // Look for common issues
-  const issues = [
-    html.includes('Details not provided'),
-    html.includes('</li></ul> <ul class="insight-list">'),
-    (html.match(/<h3 class="section-title">/g) || []).length > 2,
-    html.includes('</li> </ul>'), // Space between tags
-    html.includes('</li></ul><li>'), // List item outside list
-    html.includes('<span class="item-number">') && !html.includes('</span>'),
-    html.match(/<li>[^<]*$/) !== null // Unclosed list item at end
-  ];
-  
-  return issues.some(issue => issue);
-}
-
-function extractSections(html) {
-  const sections = [];
-  const matches = html.matchAll(/<h3 class="section-title">(.*?)<\/h3>/g);
-  
-  for (const match of matches) {
-    sections.push(match[1].trim());
-  }
-  
-  // If no sections found, use default sections
-  if (sections.length === 0) {
-    sections.push('Key Insights', 'Recommendations for Improvement');
-  }
-  
-  // Remove duplicates
-  return [...new Set(sections)];
-}
-
-function extractKeyPointsFromHtml(html) {
-  const keyPoints = [];
-  
-  // First, look for numbered items in the insight section
-  let insightSection = '';
-  const sectionMatch = html.match(/<h3 class="section-title">Key Insights<\/h3>(.*?)(?:<h3 class="section-title">|$)/s);
-  
-  if (sectionMatch) {
-    insightSection = sectionMatch[1];
-    
-    // Extract numbered items with their categories
-    const itemMatches = insightSection.matchAll(/<div class="numbered-item">[^<]*<span class="item-number">(\d+)[^<]*<\/span>[^<]*<strong>([^<]+)<\/strong>[^:]*:([^<]*)/g);
-    
-    for (const match of itemMatches) {
-      const number = match[1];
-      const category = match[2].trim();
-      const description = match[3].trim();
-      
-      keyPoints.push({
-        number,
-        category,
-        description,
-        details: []
-      });
-    }
-    
-    // Extract list items for each numbered item
-    for (let i = 0; i < keyPoints.length; i++) {
-      const startPoint = insightSection.indexOf(`<div class="numbered-item"><span class="item-number">${keyPoints[i].number}`);
-      const endPoint = (i < keyPoints.length - 1) 
-        ? insightSection.indexOf(`<div class="numbered-item"><span class="item-number">${keyPoints[i+1].number}`)
-        : insightSection.length;
-      
-      if (startPoint !== -1 && endPoint !== -1) {
-        const itemHtml = insightSection.substring(startPoint, endPoint);
-        const listItems = itemHtml.match(/<li>(.*?)<\/li>/g) || [];
-        
-        keyPoints[i].details = listItems.map(item => {
-          return item.replace(/<li>(.*?)<\/li>/, '$1').trim();
-        });
-      }
-    }
-  }
-  
-  // If we couldn't extract key points properly, create defaults
-  if (keyPoints.length === 0) {
-    keyPoints.push(
-      {
-        number: '1',
-        category: 'Visual Elements',
-        description: 'The ad uses effective visual elements',
-        details: ['Strong imagery', 'Good color scheme']
-      },
-      {
-        number: '2',
-        category: 'Messaging',
-        description: 'The messaging is clear and direct',
-        details: ['Clear value proposition', 'Strong call to action']
-      }
-    );
-  }
-  
-  return keyPoints;
-}
-
-function extractRecommendationsFromHtml(html) {
-  const recommendations = [];
-  
-  // Look for the recommendations section
-  let recSection = '';
-  const sectionMatch = html.match(/<h3 class="section-title">Recommendations[^<]*<\/h3>(.*?)(?:<h3 class="section-title">|$)/s);
-  
-  if (sectionMatch) {
-    recSection = sectionMatch[1];
-    
-    // Extract numbered items with their categories
-    const itemMatches = recSection.matchAll(/<div class="numbered-item">[^<]*<span class="item-number">(\d+)[^<]*<\/span>[^<]*<strong>([^<]+)<\/strong>[^:]*:([^<]*)/g);
-    
-    for (const match of itemMatches) {
-      const number = match[1];
-      const category = match[2].trim();
-      const description = match[3].trim();
-      
-      recommendations.push({
-        number,
-        category,
-        description,
-        details: []
-      });
-    }
-    
-    // Extract list items for each numbered item
-    for (let i = 0; i < recommendations.length; i++) {
-      const startPoint = recSection.indexOf(`<div class="numbered-item"><span class="item-number">${recommendations[i].number}`);
-      const endPoint = (i < recommendations.length - 1) 
-        ? recSection.indexOf(`<div class="numbered-item"><span class="item-number">${recommendations[i+1].number}`)
-        : recSection.length;
-      
-      if (startPoint !== -1 && endPoint !== -1) {
-        const itemHtml = recSection.substring(startPoint, endPoint);
-        const listItems = itemHtml.match(/<li>(.*?)<\/li>/g) || [];
-        
-        recommendations[i].details = listItems.map(item => {
-          return item.replace(/<li>(.*?)<\/li>/, '$1').trim();
-        });
-      }
-    }
-  }
-  
-  // If we couldn't extract recommendations properly, create defaults
-  if (recommendations.length === 0) {
-    recommendations.push(
-      {
-        number: '1',
-        category: 'Visual Enhancement',
-        description: 'Improve visual elements',
-        details: ['Use higher quality images', 'Update color scheme for better contrast']
-      },
-      {
-        number: '2',
-        category: 'Message Clarity',
-        description: 'Enhance message clarity',
-        details: ['Simplify the main call to action', 'Make value proposition more prominent']
-      }
-    );
-  }
-  
-  return recommendations;
-}
-
-function buildCleanHtmlStructure(sections, insights, recommendations, fallbackText) {
-  // Start with the main container
-  let html = '<div class="analysis-content">';
-  
-  // Add Key Insights section
-  if (sections.includes('Key Insights')) {
-    html += '<h3 class="section-title">Key Insights</h3>';
-    
-    // Add insight items
-    insights.forEach(insight => {
-      html += `<div class="numbered-item">`;
-      html += `<span class="item-number">${insight.number}.</span> `;
-      html += `<strong>${insight.category}</strong>: ${insight.description}`;
-      html += `</div>`;
-      
-      // Add insight details
-      html += `<ul class="insight-list">`;
-      if (insight.details.length > 0) {
-        insight.details.forEach(detail => {
-          html += `<li>${detail}</li>`;
-        });
-      } else {
-        html += `<li>Further details about ${insight.category.toLowerCase()}</li>`;
-      }
-      html += `</ul>`;
-    });
-  }
-  
-  // Add Recommendations section
-  if (sections.includes('Recommendations for Improvement')) {
-    html += '<h3 class="section-title">Recommendations for Improvement</h3>';
-    
-    // Add recommendation items
-    recommendations.forEach(rec => {
-      html += `<div class="numbered-item">`;
-      html += `<span class="item-number">${rec.number}.</span> `;
-      html += `<strong>${rec.category}</strong>: ${rec.description}`;
-      html += `</div>`;
-      
-      // Add recommendation details
-      html += `<ul class="insight-list">`;
-      if (rec.details.length > 0) {
-        rec.details.forEach(detail => {
-          html += `<li>${detail}</li>`;
-        });
-      } else {
-        html += `<li>Implementation suggestion for ${rec.category.toLowerCase()}</li>`;
-      }
-      html += `</ul>`;
-    });
-  } else if (sections.includes('Response to Your Question')) {
-    html += '<h3 class="section-title">Response to Your Question</h3>';
-    
-    // Use the insights as response points
-    insights.forEach((insight, index) => {
-      html += `<div class="numbered-item">`;
-      html += `<span class="item-number">${index + 1}.</span> `;
-      html += `<strong>${insight.category}</strong>: ${insight.description}`;
-      html += `</div>`;
-      
-      // Add insight details
-      html += `<ul class="insight-list">`;
-      if (insight.details.length > 0) {
-        insight.details.forEach(detail => {
-          html += `<li>${detail}</li>`;
-        });
-      } else {
-        html += `<li>Further details about ${insight.category.toLowerCase()}</li>`;
-      }
-      html += `</ul>`;
-    });
-  }
-  
-  // Close the main container
-  html += '</div>';
-  
-  return html;
 }
 
 // Start the server

@@ -4,6 +4,22 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import styles from './page.module.css';
 
+// Loading Screen Component
+const LoadingScreen = () => (
+  <div className={styles['loading-overlay']}>
+    <div className={styles['loading-content']}>
+      <div className={styles['loading-spinner']}></div>
+      <h2 className={styles['loading-title']}>Avata is reviewing your ad</h2>
+      <p className={styles['loading-message']}>
+        Our AI is analyzing your creative for effectiveness, audience alignment, and personalization opportunities.
+      </p>
+      <div className={styles['loading-progress']}>
+        <div className={styles['loading-progress-bar']}></div>
+      </div>
+    </div>
+  </div>
+);
+
 function App() {
   const [adFile, setAdFile] = useState(null);
   const [adContext, setAdContext] = useState('');
@@ -70,7 +86,13 @@ function App() {
       return;
     }
   
+    // Set analyzing state to show loading screen
     setIsAnalyzing(true);
+    setError(null);
+    
+    // Record start time for minimum loading duration
+    const startTime = Date.now();
+    const minimumLoadingTime = 1800; // 1.8 seconds minimum loading time
     
     // Create form data for API submission
     const formData = new FormData();
@@ -85,6 +107,15 @@ function App() {
         },
       });
       
+      // Calculate remaining time to meet minimum loading duration
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minimumLoadingTime - elapsedTime);
+      
+      // If API call was fast, wait the remaining time
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+      
       // Update state with review data
       setReviewData(response.data);
       
@@ -92,14 +123,15 @@ function App() {
       setChatHistory([
         { 
           role: 'assistant', 
-          content: 'Your ad has been analyzed. ' + response.data.summary + ' Would you like specific suggestions for improvement?'
+          content: 'Your ad has been analyzed. ' + (response.data.summary || 'I can provide detailed insights and recommendations.') + ' Would you like specific suggestions for improvement?'
         }
       ]);
       
     } catch (err) {
-      setError('Error analyzing your ad. Please try again.');
       console.error('Error submitting ad for review:', err);
+      setError('Error analyzing your ad: ' + (err.response?.data?.error || err.message || 'Please try again'));
     } finally {
+      // Ensure loading screen is hidden even if there's an error
       setIsAnalyzing(false);
     }
   };
@@ -148,6 +180,9 @@ function App() {
       </header>
       
       <main className={styles['main-content']}>
+        {/* Display loading screen when analyzing */}
+        {isAnalyzing && <LoadingScreen />}
+        
         {!reviewData ? (
           // Upload interface
           <div className={styles['upload-container']}>

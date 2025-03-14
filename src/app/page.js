@@ -270,6 +270,7 @@ export default function Home() {
                   const { cx, cy, index } = props;
                   return (
                     <circle
+                      key={index}
                       cx={cx}
                       cy={cy}
                       r={4}
@@ -382,6 +383,7 @@ export default function Home() {
                   const { cx, cy, index } = props;
                   return (
                     <circle
+                      key={index}
                       cx={cx}
                       cy={cy}
                       r={4}
@@ -608,6 +610,7 @@ export default function Home() {
                   const { cx, cy, index } = props;
                   return (
                     <circle
+                      key={index}
                       cx={cx}
                       cy={cy}
                       r={4}

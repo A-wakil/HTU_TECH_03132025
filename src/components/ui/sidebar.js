@@ -8,6 +8,7 @@ import {
   Leaf,
   Star,
   ChevronLeft,
+  Brush,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
@@ -22,6 +23,11 @@ const sidebarItems = [
     title: "GreenAds",
     icon: Leaf,
     href: "/greenads",
+  },
+  {
+    title: "Build",
+    icon: Brush,
+    href: "/build",
   },
   {
     title: "Reviews",

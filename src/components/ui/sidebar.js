@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import { 
   LayoutDashboard,
   Leaf,
-  Star,
+  BarChart3,
   ChevronLeft,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -25,7 +25,7 @@ const sidebarItems = [
   },
   {
     title: "Reviews",
-    icon: Star,
+    icon: BarChart3,
     href: "/review",
   },
 ]
@@ -110,11 +110,17 @@ export function Sidebar() {
           isCollapsed && "p-2"
         )}>
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-muted" />
+            <Image 
+              src="/cap_one.png"
+              alt="Capital One Logo"
+              width={32}
+              height={32}
+              className="rounded-full shrink-0"
+            />
             {!isCollapsed && (
               <div className="flex flex-col">
-                <span className="text-sm font-medium">John Doe</span>
-                <span className="text-xs text-muted-foreground">Admin</span>
+                <span className="text-sm font-medium">Kareem Emamdie</span>
+                <span className="text-xs text-muted-foreground">Software Manager</span>
               </div>
             )}
           </div>

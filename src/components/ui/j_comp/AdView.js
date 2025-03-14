@@ -410,16 +410,15 @@ function AdView({ adData, name }) {
                                         }}
                                     />
                                     <Line
-                                        type="monotone"
+                                        type="linear"
                                         dataKey="value"
                                         stroke="hsl(var(--chart-2))"
                                         strokeWidth={2}
                                         dot={(props) => {
-                                            const { cx, cy, index, payload } = props;
-                                            const uniqueKey = `dot-${payload.month}-${index}-${cx}-${cy}`;
+                                            const { cx, cy, index } = props;
                                             return (
                                                 <circle
-                                                    key={uniqueKey}
+                                                    key={`dot-${index}`}
                                                     cx={cx}
                                                     cy={cy}
                                                     r={4}
@@ -430,11 +429,10 @@ function AdView({ adData, name }) {
                                             );
                                         }}
                                         activeDot={(props) => {
-                                            const { cx, cy, index, payload } = props;
-                                            const uniqueKey = `activeDot-${payload.month}-${index}-${cx}-${cy}`;
+                                            const { cx, cy, index } = props;
                                             return (
                                                 <circle
-                                                    key={uniqueKey}
+                                                    key={`active-dot-${index}`}
                                                     cx={cx}
                                                     cy={cy}
                                                     r={6}

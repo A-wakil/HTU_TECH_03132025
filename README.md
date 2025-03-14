@@ -36,8 +36,18 @@ Avata is an AI-powered digital advertising platform that helps businesses create
    - Add context about your target audience and campaign goals
    - Receive personalization scores, audience alignment metrics, and detailed insights
    - Chat with the AI for follow-up questions and additional recommendations
-UI Interface:
-<img width="1430" alt="image" src="https://github.com/user-attachments/assets/5e41a487-79ae-4aba-98b6-cf7e750b4b99" />
+
+  
+**UI Interface:**
+
+<img width="1430" alt="image" src="https://github.com/user-attachments/assets/27dd3efa-08de-4e8e-86c7-aaf8e6fca485" />
+
+
+
+**Example of Ad generation:**
+
+<img width="1493" alt="PNG image" src="https://github.com/user-attachments/assets/271a3817-c60f-4bda-9cef-ca6bbd49134a" />
+
 
 ## How to Run the Application
 
